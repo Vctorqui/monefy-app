@@ -75,9 +75,9 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Avatar Preview */}
           <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20">
+            <Avatar className="h-20 w-20 border border-neutral-800">
               <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={username} />
-              <AvatarFallback className="text-lg">{getInitials(username)}</AvatarFallback>
+              <AvatarFallback className="text-lg bg-neutral-800">{getInitials(username)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <Label htmlFor="avatar_url">URL de Imagen de Perfil</Label>

@@ -36,11 +36,10 @@ export default async function CreditCardsPage() {
 
   return (
     <div className="flex flex-col">
-      <Header title="Tarjetas de Crédito" description="Monitorea el uso de tus tarjetas de crédito" />
-
+      
       <div className="flex-1 space-y-6 p-4 md:p-6">
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex justify-center md:justify-between items-center md:flex-row flex-col gap-4">
+          <div className="text-center md:text-left">
             <h2 className="text-2xl font-bold">Mis Tarjetas</h2>
             <p className="text-muted-foreground">Total: {creditCards?.length || 0} tarjetas</p>
           </div>
@@ -87,21 +86,6 @@ export default async function CreditCardsPage() {
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-muted-foreground mb-4">No tienes tarjetas de crédito registradas</p>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Agregar tu primera tarjeta
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Crear Nueva Tarjeta</DialogTitle>
-                  <DialogDescription>Agrega una nueva tarjeta de crédito para monitorear</DialogDescription>
-                </DialogHeader>
-                <CreditCardForm />
-              </DialogContent>
-            </Dialog>
           </div>
         )}
       </div>

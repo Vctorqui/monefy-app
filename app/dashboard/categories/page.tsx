@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server"
-import { Header } from "@/components/dashboard/header"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -29,11 +28,10 @@ export default async function CategoriesPage() {
 
   return (
     <div className="flex flex-col">
-      <Header title="Categorías" description="Organiza tus transacciones con categorías personalizadas" />
 
       <div className="flex-1 space-y-6 p-4 md:p-6">
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex justify-center md:justify-between items-center md:flex-row flex-col gap-4">
+          <div className="text-center md:text-left">
             <h2 className="text-2xl font-bold">Mis Categorías</h2>
             <p className="text-muted-foreground">Total: {categories?.length || 0} categorías</p>
           </div>
@@ -59,21 +57,6 @@ export default async function CategoriesPage() {
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-muted-foreground mb-4">No tienes categorías aún</p>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Crear tu primera categoría
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Crear Nueva Categoría</DialogTitle>
-                  <DialogDescription>Agrega una nueva categoría para organizar tus transacciones</DialogDescription>
-                </DialogHeader>
-                <CategoryForm />
-              </DialogContent>
-            </Dialog>
           </div>
         )}
       </div>
