@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { toast } from "sonner"
 
 interface UserProfileProps {
   user: {
@@ -28,6 +29,7 @@ interface UserProfileProps {
 
 export function UserProfile({ user, profile }: UserProfileProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
   const supabase = createClient()
   
@@ -35,9 +37,11 @@ export function UserProfile({ user, profile }: UserProfileProps) {
     setIsLoading(true)
     try {
       await supabase.auth.signOut()
+      toast.success("Sesión cerrada correctamente")
       router.push("/auth/login")
     } catch (error) {
       console.error("Error signing out:", error)
+      toast.error("Error al cerrar sesión")
     } finally {
       setIsLoading(false)
     }
@@ -53,11 +57,11 @@ export function UserProfile({ user, profile }: UserProfileProps) {
   }
   
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          className="relative h-10 w-auto px-3 hover:bg-neutral-800"
+          className="relative h-10 w-auto px-3 hover:bg-neutral-800 focus:bg-neutral-800"
           disabled={isLoading}
         >
           <div className="flex items-center space-x-3">
@@ -76,40 +80,6 @@ export function UserProfile({ user, profile }: UserProfileProps) {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      
-      <DropdownMenuContent className="w-56 bg-card border-neutral-800" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none text-card-foreground">
-              {profile.username}
-            </p>
-            <p className="text-xs leading-none text-neutral-400">
-              {user.email}
-            </p>
-          </div>
-        </DropdownMenuLabel>
-        
-        <DropdownMenuSeparator className="bg-neutral-800" />
-        
-        <DropdownMenuItem 
-          className="text-card-foreground hover:bg-neutral-800 cursor-pointer"
-          onClick={() => router.push("/dashboard/settings")}
-        >
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Configuración</span>
-        </DropdownMenuItem>
-        
-        <DropdownMenuSeparator className="bg-neutral-800" />
-        
-        <DropdownMenuItem 
-          className="text-card-foreground hover:bg-neutral-800 cursor-pointer"
-          onClick={handleSignOut}
-          disabled={isLoading}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>{isLoading ? "Cerrando..." : "Cerrar Sesión"}</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
     </DropdownMenu>
   )
 }
