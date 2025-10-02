@@ -115,11 +115,11 @@ export function TransactionList({ transactions, accounts, creditCards, categorie
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-4 relative">
         {transactions.map((transaction) => (
           <div key={transaction.id} className="flex items-center justify-between border rounded-lg p-4">
             <div className="flex-1">
-              <div className="flex items-center gap-2">
+              <div className="flex md:items-center gap-2 md:flex-row flex-col items-start">
                 <p className="font-medium">{transaction.description || "Sin descripción"}</p>
                 <span
                   className={`text-xs px-2 py-1 rounded-full ${transaction.type === "income" ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}
@@ -127,20 +127,20 @@ export function TransactionList({ transactions, accounts, creditCards, categorie
                   {transaction.type === "income" ? "Ingreso" : "Gasto"}
                 </span>
               </div>
-              <div className="flex gap-4 mt-1 text-sm text-muted-foreground">
+              <div className="flex gap-2 md:gap-4 mt-1 text-sm text-muted-foreground md:flex-row flex-col">
                 <span>{getAccountName(transaction)}</span>
                 {transaction.category_id && <span>• {getCategoryName(transaction)}</span>}
                 <span>• {new Date(transaction.date).toLocaleDateString()}</span>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 mt-8">
               <div
                 className={`text-lg font-semibold ${transaction.type === "income" ? "text-green-500" : "text-red-500"}`}
               >
                 {transaction.type === "income" ? "+" : "-"}
                 {formatCurrency(Number(transaction.amount), currency)}
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 absolute right-4 top-2">
                 <Button variant="ghost" size="icon" onClick={() => handleEdit(transaction)}>
                   <Pencil className="h-4 w-4" />
                   <span className="sr-only">Editar</span>
