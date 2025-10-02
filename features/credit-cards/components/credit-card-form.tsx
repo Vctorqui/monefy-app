@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
+import { toast } from "sonner"
 interface CreditCardFormProps {
   card?: {
     id: string
@@ -63,6 +63,7 @@ export function CreditCardForm({ card, onSuccess }: CreditCardFormProps) {
           .eq("id", card.id)
 
         if (error) throw error
+        toast.success("Tarjeta actualizada correctamente")
       } else {
         // Create new card
         const { error } = await supabase.from("credit_cards").insert({
@@ -74,12 +75,13 @@ export function CreditCardForm({ card, onSuccess }: CreditCardFormProps) {
         })
 
         if (error) throw error
+        toast.success("Tarjeta creada correctamente")
       }
 
       router.refresh()
       if (onSuccess) onSuccess()
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Error al guardar la tarjeta")
+      toast.error(error instanceof Error ? error.message : "Error al guardar la tarjeta")
     } finally {
       setIsLoading(false)
     }

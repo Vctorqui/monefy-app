@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { createBrowserClient } from "@/lib/supabase/client"
 import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 interface ProfileFormProps {
   profile: {
@@ -47,10 +48,10 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       if (error) throw error
 
       router.refresh()
-      alert("Perfil actualizado correctamente")
+      toast.success("Perfil actualizado correctamente")
     } catch (error) {
       console.error("Error updating profile:", error)
-      alert("Error al actualizar el perfil")
+      toast.error("Error al actualizar el perfil")
     } finally {
       setIsLoading(false)
     }
@@ -75,9 +76,15 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Avatar Preview */}
           <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20">
-              <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={username} />
-              <AvatarFallback className="text-lg">{getInitials(username)}</AvatarFallback>
+            <Avatar className="h-20 w-20 border border-neutral-800">
+              {avatarUrl ? (
+                <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={profile.username} />
+              ) : (
+                <AvatarFallback className="bg-sherwood-green-500 text-white text-sm">
+                  {getInitials(profile.username)}
+                </AvatarFallback>
+              )}
+            
             </Avatar>
             <div className="flex-1">
               <Label htmlFor="avatar_url">URL de Imagen de Perfil</Label>

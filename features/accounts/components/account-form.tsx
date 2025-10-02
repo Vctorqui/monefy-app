@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
+import { toast } from "sonner"
 interface AccountFormProps {
   account?: {
     id: string
@@ -57,6 +57,7 @@ export function AccountForm({ account, onSuccess }: AccountFormProps) {
           .eq("id", account.id)
 
         if (error) throw error
+        toast.success("Cuenta actualizada correctamente")
       } else {
         // Create new account
         const { error } = await supabase.from("accounts").insert({
@@ -68,12 +69,13 @@ export function AccountForm({ account, onSuccess }: AccountFormProps) {
         })
 
         if (error) throw error
+        toast.success("Cuenta creada correctamente")
       }
 
       router.refresh()
       if (onSuccess) onSuccess()
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Error al guardar la cuenta")
+      toast.error(error instanceof Error ? error.message : "Error al guardar la cuenta")
     } finally {
       setIsLoading(false)
     }

@@ -4,74 +4,76 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  /* Combinación: Fondos neutros + Acentos Sherwood Green */
+  --background: #171717; /* neutral-950 - fondo negro */
+  --foreground: #f8f9fa; /* neutral-50 - texto claro sobre fondo negro */
+  --card: #171717; /* neutral-950 - cards negras */
+  --card-foreground: #f8f9fa; /* neutral-50 - texto claro sobre fondo negro */
+  --popover: #171717; /* neutral-950 - popovers también negros */
+  --popover-foreground: #f8f9fa; /* neutral-50 - texto claro sobre fondo negro */
+  --primary: #00856c; /* sherwood-green-500 - botones primarios */
+  --primary-foreground: #ffffff;
+  --secondary: #f1f3f4; /* neutral-100 - fondos secundarios */
+  --secondary-foreground: #202124; /* neutral-900 */
+  --muted: #f1f3f4; /* neutral-100 */
+  --muted-foreground: #5f6368; /* neutral-700 */
+  --accent: #00d7af; /* sherwood-green-200 - acentos brillantes */
+  --accent-foreground: #00150f; /* sherwood-green-950 */
+  --destructive: #dc2626; /* rojo para errores */
+  --destructive-foreground: #ffffff;
+  --border: #e8eaed; /* neutral-200 - bordes sutiles */
+  --input: #e8eaed; /* neutral-200 */
+  --ring: #00856c; /* sherwood-green-500 */
+  --chart-1: #00856c; /* sherwood-green-500 */
+  --chart-2: #00b997; /* sherwood-green-300 */
+  --chart-3: #00d7af; /* sherwood-green-200 */
+  --chart-4: #009e80; /* sherwood-green-400 */
+  --chart-5: #006e58; /* sherwood-green-600 */
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #000000; /* negro puro - sidebar negro */
+  --sidebar-foreground: #f8f9fa; /* neutral-50 - texto claro */
+  --sidebar-primary: #00d7af; /* sherwood-green-200 - primario brillante */
+  --sidebar-primary-foreground: #00150f; /* sherwood-green-950 */
+  --sidebar-accent: #171717; /* neutral-950 - acentos oscuros */
+  --sidebar-accent-foreground: #f8f9fa; /* neutral-50 */
+  --sidebar-border: #3c4043; /* neutral-800 - bordes sutiles */
+  --sidebar-ring: #00d7af; /* sherwood-green-200 */
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* Tema oscuro: Fondos neutros oscuros + Acentos Sherwood Green */
+  --background: #000000; /* negro puro - fondo súper oscuro */
+  --foreground: #f8f9fa; /* neutral-50 - texto claro */
+  --card: #000000; /* negro puro - cards súper oscuras */
+  --card-foreground: #f8f9fa; /* neutral-50 */
+  --popover: #000000; /* negro puro - popovers súper oscuros */
+  --popover-foreground: #f8f9fa; /* neutral-50 */
+  --primary: #00d7af; /* sherwood-green-200 - primario brillante */
+  --primary-foreground: #00150f; /* sherwood-green-950 */
+  --secondary: #5f6368; /* neutral-700 */
+  --secondary-foreground: #f8f9fa; /* neutral-50 */
+  --muted: #5f6368; /* neutral-700 */
+  --muted-foreground: #9aa0a6; /* neutral-500 */
+  --accent: #00f9cb; /* sherwood-green-100 - acento muy brillante */
+  --accent-foreground: #00150f; /* sherwood-green-950 */
+  --destructive: #dc2626; /* rojo para errores */
+  --destructive-foreground: #ffffff;
+  --border: #5f6368; /* neutral-700 */
+  --input: #5f6368; /* neutral-700 */
+  --ring: #00d7af; /* sherwood-green-200 */
+  --chart-1: #00d7af; /* sherwood-green-200 */
+  --chart-2: #00f9cb; /* sherwood-green-100 */
+  --chart-3: #b8ffe8; /* sherwood-green-50 */
+  --chart-4: #00b997; /* sherwood-green-300 */
+  --chart-5: #009e80; /* sherwood-green-400 */
+  --sidebar: #000000; /* negro puro - sidebar súper oscuro */
+  --sidebar-foreground: #f8f9fa; /* neutral-50 */
+  --sidebar-primary: #00f9cb; /* sherwood-green-100 - primario súper brillante */
+  --sidebar-primary-foreground: #00150f; /* sherwood-green-950 */
+  --sidebar-accent: #171717; /* neutral-950 - acentos muy oscuros */
+  --sidebar-accent-foreground: #f8f9fa; /* neutral-50 */
+  --sidebar-border: #3c4043; /* neutral-800 - bordes sutiles */
+  --sidebar-ring: #00f9cb; /* sherwood-green-100 */
 }
 
 @theme inline {

@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server"
-import { Header } from "@/components/dashboard/header"
+"use client"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -13,41 +13,73 @@ import { Plus } from "lucide-react"
 import { TransactionForm } from "@/features/transactions/components/transaction-form"
 import { TransactionList } from "@/features/transactions/components/transaction-list"
 import type { Currency } from "@/lib/utils/currency"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
 
-export default async function TransactionsPage() {
-  const supabase = await createClient()
+export default function TransactionsPage() {
+  const [transactions, setTransactions] = useState<any[]>([])
+  const [accounts, setAccounts] = useState<any[]>([])
+  const [creditCards, setCreditCards] = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [userCurrency, setUserCurrency] = useState<Currency>("USD")
+  const supabase = createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  useEffect(() => {
+    fetchData()
+  }, [])
 
-  const { data: profile } = await supabase.from("profiles").select("currency").eq("id", user?.id).single()
-  const userCurrency: Currency = profile?.currency || "USD"
+  const fetchData = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-  const { data: transactions, error: transactionsError } = await supabase
-    .from("transactions")
-    .select("*")
-    .eq("user_id", user?.id)
-    .order("date", { ascending: false })
+      if (user) {
+        const { data: profile } = await supabase.from("profiles").select("currency").eq("id", user.id).single()
+        setUserCurrency(profile?.currency || "USD")
 
+        // Fetch all data in parallel
+        const [
+          { data: transactionsData },
+          { data: accountsData },
+          { data: creditCardsData },
+          { data: categoriesData }
+        ] = await Promise.all([
+          supabase.from("transactions").select("*").eq("user_id", user.id).order("date", { ascending: false }),
+          supabase.from("accounts").select("id, name").eq("user_id", user.id),
+          supabase.from("credit_cards").select("id, name, limit_amount, current_spent").eq("user_id", user.id),
+          supabase.from("categories").select("id, name, type").eq("user_id", user.id)
+        ])
 
-  const { data: accounts } = await supabase.from("accounts").select("id, name").eq("user_id", user?.id)
+        setTransactions(transactionsData || [])
+        setAccounts(accountsData || [])
+        setCreditCards(creditCardsData || [])
+        setCategories(categoriesData || [])
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-  const { data: creditCards } = await supabase.from("credit_cards").select("id, name, limit_amount, current_spent").eq("user_id", user?.id)
-
-  const { data: categories } = await supabase.from("categories").select("id, name, type").eq("user_id", user?.id)
+  const handleTransactionCreated = () => {
+    setIsModalOpen(false)
+    fetchData() // Recargar todos los datos
+  }
 
   return (
     <div className="flex flex-col">
-      <Header title="Transacciones" description="Gestiona tus ingresos y gastos" />
 
       <div className="flex-1 space-y-6 p-4 md:p-6">
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex justify-center md:justify-between items-center md:flex-row flex-col gap-4">
+          <div className="text-center md:text-left">
             <h2 className="text-2xl font-bold">Mis Transacciones</h2>
             <p className="text-muted-foreground">Total: {transactions?.length || 0} transacciones</p>
           </div>
-          <Dialog>
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -62,13 +94,18 @@ export default async function TransactionsPage() {
               <TransactionForm 
                 accounts={accounts || []} 
                 creditCards={creditCards || []}
-                categories={categories || []} 
+                categories={categories || []}
+                onSuccess={handleTransactionCreated}
               />
             </DialogContent>
           </Dialog>
         </div>
 
-        {transactions && transactions.length > 0 ? (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <p className="text-muted-foreground">Cargando transacciones...</p>
+          </div>
+        ) : transactions && transactions.length > 0 ? (
           <TransactionList
             transactions={transactions}
             accounts={accounts || []}
@@ -79,25 +116,6 @@ export default async function TransactionsPage() {
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-muted-foreground mb-4">No tienes transacciones aún</p>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Crear tu primera transacción
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Crear Nueva Transacción</DialogTitle>
-                  <DialogDescription>Registra un nuevo ingreso o gasto</DialogDescription>
-                </DialogHeader>
-                <TransactionForm 
-                accounts={accounts || []} 
-                creditCards={creditCards || []}
-                categories={categories || []} 
-              />
-              </DialogContent>
-            </Dialog>
           </div>
         )}
       </div>

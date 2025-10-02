@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { toast } from "sonner"
 
 interface TransactionFormProps {
   accounts: Array<{ id: string; name: string }>
@@ -83,6 +84,7 @@ export function TransactionForm({ accounts, creditCards, categories, transaction
           })
           .eq("id", transaction.id)
 
+
         if (error) throw error
 
         // Update balance based on account type
@@ -93,6 +95,7 @@ export function TransactionForm({ accounts, creditCards, categories, transaction
             const newAmount = type === "income" ? transactionAmount : -transactionAmount
             const newBalance = Number(account.current_balance) + oldAmount + newAmount
             await supabase.from("accounts").update({ current_balance: newBalance }).eq("id", accountId)
+            toast.success("Transacción actualizada correctamente")
           }
         } else {
           const { data: card } = await supabase.from("credit_cards").select("current_spent").eq("id", accountId).single()
@@ -101,6 +104,7 @@ export function TransactionForm({ accounts, creditCards, categories, transaction
             const newAmount = type === "expense" ? transactionAmount : -transactionAmount
             const newSpent = Number(card.current_spent) - oldAmount + newAmount
             await supabase.from("credit_cards").update({ current_spent: newSpent }).eq("id", accountId)
+            toast.success("Transacción actualizada correctamente")
           }
         }
       } else {
@@ -125,6 +129,7 @@ export function TransactionForm({ accounts, creditCards, categories, transaction
             const balanceChange = type === "income" ? transactionAmount : -transactionAmount
             const newBalance = Number(account.current_balance) + balanceChange
             await supabase.from("accounts").update({ current_balance: newBalance }).eq("id", accountId)
+            toast.success("Transacción creada correctamente")
           }
         } else {
           const { data: card } = await supabase.from("credit_cards").select("current_spent").eq("id", accountId).single()
@@ -132,6 +137,7 @@ export function TransactionForm({ accounts, creditCards, categories, transaction
             const spentChange = type === "expense" ? transactionAmount : -transactionAmount
             const newSpent = Number(card.current_spent) + spentChange
             await supabase.from("credit_cards").update({ current_spent: newSpent }).eq("id", accountId)
+            toast.success("Transacción creada correctamente")
           }
         }
       }
@@ -139,7 +145,7 @@ export function TransactionForm({ accounts, creditCards, categories, transaction
       router.refresh()
       if (onSuccess) onSuccess()
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Error al guardar la transacción")
+      toast.error(error instanceof Error ? error.message : "Error al guardar la transacción")
     } finally {
       setIsLoading(false)
     }

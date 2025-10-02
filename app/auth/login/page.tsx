@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { toast } from "sonner"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -30,8 +31,18 @@ export default function LoginPage() {
         password,
       })
       if (error) throw error
-      router.push("/dashboard")
-      router.refresh()
+      
+      // Mostrar mensaje de bienvenida
+      toast.success("¡Bienvenido! Has iniciado sesión correctamente", {
+        description: "Redirigiendo al dashboard...",
+        duration: 3000,
+      })
+      
+      // Pequeño delay para que se vea el toast antes de redirigir
+      setTimeout(() => {
+        router.push("/dashboard")
+        router.refresh()
+      }, 1000)
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Error al iniciar sesión")
     } finally {

@@ -2,6 +2,7 @@ import type React from "react"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { Sidebar } from "@/components/dashboard/sidebar"
+import { Header } from "@/components/dashboard/header"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -46,6 +47,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Header con breadcrumb y perfil */}
+        <Header 
+          user={user}
+          profile={profile}
+        />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
