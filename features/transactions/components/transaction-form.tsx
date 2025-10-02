@@ -13,10 +13,12 @@ import { Textarea } from "@/components/ui/textarea"
 
 interface TransactionFormProps {
   accounts: Array<{ id: string; name: string }>
+  creditCards: Array<{ id: string; name: string; limit_amount: number; current_spent: number }>
   categories: Array<{ id: string; name: string; type: string }>
   transaction?: {
     id: string
     account_id: string
+    account_type: string
     category_id: string | null
     date: string
     amount: number
@@ -26,18 +28,30 @@ interface TransactionFormProps {
   onSuccess?: () => void
 }
 
-export function TransactionForm({ accounts, categories, transaction, onSuccess }: TransactionFormProps) {
+export function TransactionForm({ accounts, creditCards, categories, transaction, onSuccess }: TransactionFormProps) {
   const [accountId, setAccountId] = useState(transaction?.account_id || "")
   const [categoryId, setCategoryId] = useState(transaction?.category_id || "")
   const [date, setDate] = useState(transaction?.date || new Date().toISOString().split("T")[0])
   const [amount, setAmount] = useState(transaction?.amount?.toString() || "")
   const [description, setDescription] = useState(transaction?.description || "")
   const [type, setType] = useState(transaction?.type || "expense")
+  const [accountType, setAccountType] = useState<"account" | "credit_card">(
+    (transaction?.account_type as "account" | "credit_card") || "account"
+  )
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const filteredCategories = categories.filter((cat) => cat.type === type)
+
+  // Reset type to expense when credit card is selected
+  const handleAccountTypeChange = (value: "account" | "credit_card") => {
+    setAccountType(value)
+    setAccountId("") // Reset selection when changing type
+    if (value === "credit_card") {
+      setType("expense") // Credit cards can only have expenses
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,6 +74,7 @@ export function TransactionForm({ accounts, categories, transaction, onSuccess }
           .from("transactions")
           .update({
             account_id: accountId,
+            account_type: accountType,
             category_id: categoryId || null,
             date,
             amount: transactionAmount,
@@ -70,21 +85,30 @@ export function TransactionForm({ accounts, categories, transaction, onSuccess }
 
         if (error) throw error
 
-        // Update account balance
-        const { data: account } = await supabase.from("accounts").select("current_balance").eq("id", accountId).single()
-
-        if (account) {
-          const oldAmount = transaction.type === "income" ? -transaction.amount : transaction.amount
-          const newAmount = type === "income" ? transactionAmount : -transactionAmount
-          const newBalance = Number(account.current_balance) + oldAmount + newAmount
-
-          await supabase.from("accounts").update({ current_balance: newBalance }).eq("id", accountId)
+        // Update balance based on account type
+        if (accountType === "account") {
+          const { data: account } = await supabase.from("accounts").select("current_balance").eq("id", accountId).single()
+          if (account) {
+            const oldAmount = transaction.type === "income" ? -transaction.amount : transaction.amount
+            const newAmount = type === "income" ? transactionAmount : -transactionAmount
+            const newBalance = Number(account.current_balance) + oldAmount + newAmount
+            await supabase.from("accounts").update({ current_balance: newBalance }).eq("id", accountId)
+          }
+        } else {
+          const { data: card } = await supabase.from("credit_cards").select("current_spent").eq("id", accountId).single()
+          if (card) {
+            const oldAmount = transaction.type === "expense" ? transaction.amount : -transaction.amount
+            const newAmount = type === "expense" ? transactionAmount : -transactionAmount
+            const newSpent = Number(card.current_spent) - oldAmount + newAmount
+            await supabase.from("credit_cards").update({ current_spent: newSpent }).eq("id", accountId)
+          }
         }
       } else {
         // Create new transaction
         const { error } = await supabase.from("transactions").insert({
           user_id: user.id,
           account_id: accountId,
+          account_type: accountType,
           category_id: categoryId || null,
           date,
           amount: transactionAmount,
@@ -94,14 +118,21 @@ export function TransactionForm({ accounts, categories, transaction, onSuccess }
 
         if (error) throw error
 
-        // Update account balance
-        const { data: account } = await supabase.from("accounts").select("current_balance").eq("id", accountId).single()
-
-        if (account) {
-          const balanceChange = type === "income" ? transactionAmount : -transactionAmount
-          const newBalance = Number(account.current_balance) + balanceChange
-
-          await supabase.from("accounts").update({ current_balance: newBalance }).eq("id", accountId)
+        // Update balance based on account type
+        if (accountType === "account") {
+          const { data: account } = await supabase.from("accounts").select("current_balance").eq("id", accountId).single()
+          if (account) {
+            const balanceChange = type === "income" ? transactionAmount : -transactionAmount
+            const newBalance = Number(account.current_balance) + balanceChange
+            await supabase.from("accounts").update({ current_balance: newBalance }).eq("id", accountId)
+          }
+        } else {
+          const { data: card } = await supabase.from("credit_cards").select("current_spent").eq("id", accountId).single()
+          if (card) {
+            const spentChange = type === "expense" ? transactionAmount : -transactionAmount
+            const newSpent = Number(card.current_spent) + spentChange
+            await supabase.from("credit_cards").update({ current_spent: newSpent }).eq("id", accountId)
+          }
         }
       }
 
@@ -118,7 +149,11 @@ export function TransactionForm({ accounts, categories, transaction, onSuccess }
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="type">Tipo</Label>
-        <Select value={type} onValueChange={setType} disabled={isLoading}>
+        <Select 
+          value={type} 
+          onValueChange={setType} 
+          disabled={isLoading || accountType === "credit_card"}
+        >
           <SelectTrigger id="type">
             <SelectValue placeholder="Selecciona un tipo" />
           </SelectTrigger>
@@ -127,22 +162,55 @@ export function TransactionForm({ accounts, categories, transaction, onSuccess }
             <SelectItem value="expense">Gasto</SelectItem>
           </SelectContent>
         </Select>
+        {accountType === "credit_card" && (
+          <p className="text-xs text-muted-foreground">
+            Las tarjetas de crédito solo permiten gastos
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="account">Cuenta</Label>
-        <Select value={accountId} onValueChange={setAccountId} disabled={isLoading} required>
-          <SelectTrigger id="account">
-            <SelectValue placeholder="Selecciona una cuenta" />
+        <Label htmlFor="accountType">Tipo de Cuenta</Label>
+        <Select value={accountType} onValueChange={handleAccountTypeChange} disabled={isLoading}>
+          <SelectTrigger id="accountType">
+            <SelectValue placeholder="Selecciona el tipo de cuenta" />
           </SelectTrigger>
           <SelectContent>
-            {accounts.map((account) => (
-              <SelectItem key={account.id} value={account.id}>
-                {account.name}
-              </SelectItem>
-            ))}
+            <SelectItem value="account">Cuenta Bancaria</SelectItem>
+            <SelectItem value="credit_card">Tarjeta de Crédito</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="account">
+          {accountType === "account" ? "Cuenta" : "Tarjeta de Crédito"}
+        </Label>
+        <Select value={accountId} onValueChange={setAccountId} disabled={isLoading} required>
+          <SelectTrigger id="account">
+            <SelectValue placeholder={`Selecciona una ${accountType === "account" ? "cuenta" : "tarjeta"}`} />
+          </SelectTrigger>
+          <SelectContent>
+            {accountType === "account" ? (
+              accounts.map((account) => (
+                <SelectItem key={account.id} value={account.id}>
+                  {account.name}
+                </SelectItem>
+              ))
+            ) : (
+              creditCards.map((card) => (
+                <SelectItem key={card.id} value={card.id}>
+                  {card.name} - Disponible: ${(card.limit_amount - card.current_spent).toLocaleString()}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
+        {accountType === "credit_card" && accountId && (
+          <p className="text-xs text-muted-foreground">
+            Solo se pueden registrar gastos con tarjetas de crédito
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">

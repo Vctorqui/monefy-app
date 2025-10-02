@@ -115,7 +115,7 @@ export function CategoryList({ categories }: CategoryListProps) {
             Categorías de Ingresos ({incomeCategories.length})
           </h3>
           {incomeCategories.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-3 flex gap-2 items-center">
               {incomeCategories.map((category) => (
                 <CategoryItem key={category.id} category={category} />
               ))}
@@ -131,7 +131,7 @@ export function CategoryList({ categories }: CategoryListProps) {
             Categorías de Gastos ({expenseCategories.length})
           </h3>
           {expenseCategories.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-3 flex gap-2 items-center">
               {expenseCategories.map((category) => (
                 <CategoryItem key={category.id} category={category} />
               ))}

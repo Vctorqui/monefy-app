@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS public.categories (
 CREATE TABLE IF NOT EXISTS public.transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  account_id UUID NOT NULL REFERENCES public.accounts(id) ON DELETE CASCADE,
+  account_id UUID NOT NULL,
+  account_type TEXT DEFAULT 'account' CHECK (account_type IN ('account', 'credit_card')),
   category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
   date DATE NOT NULL DEFAULT CURRENT_DATE,
   amount DECIMAL(12, 2) NOT NULL,

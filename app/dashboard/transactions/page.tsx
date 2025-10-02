@@ -24,13 +24,16 @@ export default async function TransactionsPage() {
   const { data: profile } = await supabase.from("profiles").select("currency").eq("id", user?.id).single()
   const userCurrency: Currency = profile?.currency || "USD"
 
-  const { data: transactions } = await supabase
+  const { data: transactions, error: transactionsError } = await supabase
     .from("transactions")
-    .select("*, accounts(name), categories(name)")
+    .select("*")
     .eq("user_id", user?.id)
     .order("date", { ascending: false })
 
+
   const { data: accounts } = await supabase.from("accounts").select("id, name").eq("user_id", user?.id)
+
+  const { data: creditCards } = await supabase.from("credit_cards").select("id, name, limit_amount, current_spent").eq("user_id", user?.id)
 
   const { data: categories } = await supabase.from("categories").select("id, name, type").eq("user_id", user?.id)
 
@@ -56,7 +59,11 @@ export default async function TransactionsPage() {
                 <DialogTitle>Crear Nueva Transacción</DialogTitle>
                 <DialogDescription>Registra un nuevo ingreso o gasto</DialogDescription>
               </DialogHeader>
-              <TransactionForm accounts={accounts || []} categories={categories || []} />
+              <TransactionForm 
+                accounts={accounts || []} 
+                creditCards={creditCards || []}
+                categories={categories || []} 
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -65,6 +72,7 @@ export default async function TransactionsPage() {
           <TransactionList
             transactions={transactions}
             accounts={accounts || []}
+            creditCards={creditCards || []}
             categories={categories || []}
             currency={userCurrency}
           />
@@ -83,7 +91,11 @@ export default async function TransactionsPage() {
                   <DialogTitle>Crear Nueva Transacción</DialogTitle>
                   <DialogDescription>Registra un nuevo ingreso o gasto</DialogDescription>
                 </DialogHeader>
-                <TransactionForm accounts={accounts || []} categories={categories || []} />
+                <TransactionForm 
+                accounts={accounts || []} 
+                creditCards={creditCards || []}
+                categories={categories || []} 
+              />
               </DialogContent>
             </Dialog>
           </div>

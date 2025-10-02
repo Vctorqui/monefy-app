@@ -23,27 +23,45 @@ import { formatCurrency, type Currency } from "@/lib/utils/currency"
 interface Transaction {
   id: string
   account_id: string
+  account_type: string
   category_id: string | null
   date: string
   amount: number
   description: string | null
   type: string
-  accounts: { name: string } | null
-  categories: { name: string } | null
 }
 
 interface TransactionListProps {
   transactions: Transaction[]
   accounts: Array<{ id: string; name: string }>
+  creditCards: Array<{ id: string; name: string; limit_amount: number; current_spent: number }>
   categories: Array<{ id: string; name: string; type: string }>
   currency?: Currency
 }
 
-export function TransactionList({ transactions, accounts, categories, currency = "USD" }: TransactionListProps) {
+export function TransactionList({ transactions, accounts, creditCards, categories, currency = "USD" }: TransactionListProps) {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const router = useRouter()
+
+
+  // Función para obtener el nombre de la cuenta/tarjeta
+  const getAccountName = (transaction: Transaction) => {
+    if (transaction.account_type === "account") {
+      const account = accounts.find(acc => acc.id === transaction.account_id)
+      return account?.name || "Cuenta no encontrada"
+    } else {
+      const card = creditCards.find(card => card.id === transaction.account_id)
+      return card?.name || "Tarjeta no encontrada"
+    }
+  }
+
+  // Función para obtener el nombre de la categoría
+  const getCategoryName = (transaction: Transaction) => {
+    const category = categories.find(cat => cat.id === transaction.category_id)
+    return category?.name || "Sin categoría"
+  }
 
   const handleDelete = async (transaction: Transaction) => {
     const supabase = createClient()
@@ -55,18 +73,31 @@ export function TransactionList({ transactions, accounts, categories, currency =
 
       if (error) throw error
 
-      // Update account balance
-      const { data: account } = await supabase
-        .from("accounts")
-        .select("current_balance")
-        .eq("id", transaction.account_id)
-        .single()
+      // Update balance based on account type
+      if (transaction.account_type === "account") {
+        const { data: account } = await supabase
+          .from("accounts")
+          .select("current_balance")
+          .eq("id", transaction.account_id)
+          .single()
 
-      if (account) {
-        const balanceChange = transaction.type === "income" ? -transaction.amount : transaction.amount
-        const newBalance = Number(account.current_balance) + balanceChange
+        if (account) {
+          const balanceChange = transaction.type === "income" ? -transaction.amount : transaction.amount
+          const newBalance = Number(account.current_balance) + balanceChange
+          await supabase.from("accounts").update({ current_balance: newBalance }).eq("id", transaction.account_id)
+        }
+      } else if (transaction.account_type === "credit_card") {
+        const { data: card } = await supabase
+          .from("credit_cards")
+          .select("current_spent")
+          .eq("id", transaction.account_id)
+          .single()
 
-        await supabase.from("accounts").update({ current_balance: newBalance }).eq("id", transaction.account_id)
+        if (card) {
+          const spentChange = transaction.type === "expense" ? -transaction.amount : transaction.amount
+          const newSpent = Number(card.current_spent) + spentChange
+          await supabase.from("credit_cards").update({ current_spent: newSpent }).eq("id", transaction.account_id)
+        }
       }
 
       router.refresh()
@@ -97,8 +128,8 @@ export function TransactionList({ transactions, accounts, categories, currency =
                 </span>
               </div>
               <div className="flex gap-4 mt-1 text-sm text-muted-foreground">
-                <span>{transaction.accounts?.name}</span>
-                {transaction.categories && <span>• {transaction.categories.name}</span>}
+                <span>{getAccountName(transaction)}</span>
+                {transaction.category_id && <span>• {getCategoryName(transaction)}</span>}
                 <span>• {new Date(transaction.date).toLocaleDateString()}</span>
               </div>
             </div>
@@ -156,6 +187,7 @@ export function TransactionList({ transactions, accounts, categories, currency =
           {editingTransaction && (
             <TransactionForm
               accounts={accounts}
+              creditCards={creditCards}
               categories={categories}
               transaction={editingTransaction}
               onSuccess={() => setIsEditOpen(false)}

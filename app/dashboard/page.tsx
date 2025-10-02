@@ -25,10 +25,15 @@ export default async function DashboardPage() {
   // Fetch recent transactions
   const { data: transactions } = await supabase
     .from("transactions")
-    .select("*, accounts(name), categories(name)")
+    .select("*")
     .eq("user_id", user?.id)
     .order("date", { ascending: false })
     .limit(5)
+
+  // Fetch accounts and categories for display
+  const { data: allAccounts } = await supabase.from("accounts").select("id, name").eq("user_id", user?.id)
+  const { data: allCategories } = await supabase.from("categories").select("id, name").eq("user_id", user?.id)
+  const { data: allCreditCards } = await supabase.from("credit_cards").select("id, name").eq("user_id", user?.id)
 
   // Calculate monthly income and expenses
   const currentMonth = new Date().getMonth()
@@ -47,6 +52,22 @@ export default async function DashboardPage() {
 
   // Fetch credit cards
   const { data: creditCards } = await supabase.from("credit_cards").select("*").eq("user_id", user?.id)
+
+  // Helper functions to get names
+  const getAccountName = (transaction: any) => {
+    if (transaction.account_type === "account") {
+      const account = allAccounts?.find(acc => acc.id === transaction.account_id)
+      return account?.name || "Cuenta no encontrada"
+    } else {
+      const card = allCreditCards?.find(card => card.id === transaction.account_id)
+      return card?.name || "Tarjeta no encontrada"
+    }
+  }
+
+  const getCategoryName = (transaction: any) => {
+    const category = allCategories?.find(cat => cat.id === transaction.category_id)
+    return category?.name || "Sin categoría"
+  }
 
   return (
     <div className="flex flex-col">
@@ -114,7 +135,7 @@ export default async function DashboardPage() {
                     <div className="flex-1">
                       <p className="font-medium">{transaction.description || "Sin descripción"}</p>
                       <p className="text-sm text-muted-foreground">
-                        {transaction.categories?.name} • {transaction.accounts?.name}
+                        {getCategoryName(transaction)} • {getAccountName(transaction)}
                       </p>
                       <p className="text-xs text-muted-foreground">{new Date(transaction.date).toLocaleDateString()}</p>
                     </div>
