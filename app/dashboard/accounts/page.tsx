@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server"
+"use client"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -12,22 +13,49 @@ import { Plus } from "lucide-react"
 import { AccountCard } from "@/features/accounts/components/account-card"
 import { AccountForm } from "@/features/accounts/components/account-form"
 import type { Currency } from "@/lib/utils/currency"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
 
-export default async function AccountsPage() {
-  const supabase = await createClient()
+export default function AccountsPage() {
+  const [accounts, setAccounts] = useState<any[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [userCurrency, setUserCurrency] = useState<Currency>("USD")
+  const supabase = createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  useEffect(() => {
+    fetchAccounts()
+  }, [])
 
-  const { data: profile } = await supabase.from("profiles").select("currency").eq("id", user?.id).single()
-  const userCurrency: Currency = profile?.currency || "USD"
+  const fetchAccounts = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-  const { data: accounts } = await supabase
-    .from("accounts")
-    .select("*")
-    .eq("user_id", user?.id)
-    .order("created_at", { ascending: false })
+      if (user) {
+        const { data: profile } = await supabase.from("profiles").select("currency").eq("id", user.id).single()
+        setUserCurrency(profile?.currency || "USD")
+
+        const { data: accountsData } = await supabase
+          .from("accounts")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+
+        setAccounts(accountsData || [])
+      }
+    } catch (error) {
+      console.error("Error fetching accounts:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleAccountCreated = () => {
+    setIsModalOpen(false)
+    fetchAccounts() // Recargar las cuentas
+  }
 
   return (
     <div className="flex flex-col">
@@ -38,7 +66,7 @@ export default async function AccountsPage() {
             <h2 className="text-2xl font-bold">Mis Cuentas</h2>
             <p className="text-muted-foreground">Total: {accounts?.length || 0} cuentas</p>
           </div>
-          <Dialog>
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -50,12 +78,16 @@ export default async function AccountsPage() {
                 <DialogTitle>Crear Nueva Cuenta</DialogTitle>
                 <DialogDescription>Agrega una nueva cuenta para gestionar tus finanzas</DialogDescription>
               </DialogHeader>
-              <AccountForm />
+              <AccountForm onSuccess={handleAccountCreated} />
             </DialogContent>
           </Dialog>
         </div>
 
-        {accounts && accounts.length > 0 ? (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <p className="text-muted-foreground">Cargando cuentas...</p>
+          </div>
+        ) : accounts && accounts.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {accounts.map((account) => (
               <AccountCard key={account.id} account={account} currency={userCurrency} />
@@ -64,7 +96,6 @@ export default async function AccountsPage() {
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-muted-foreground mb-4">No tienes cuentas aún</p>
-           
           </div>
         )}
       </div>

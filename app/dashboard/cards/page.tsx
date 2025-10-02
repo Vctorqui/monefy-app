@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server"
-import { Header } from "@/components/dashboard/header"
+"use client"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -13,22 +13,49 @@ import { Plus } from "lucide-react"
 import { CreditCardForm } from "@/features/credit-cards/components/credit-card-form"
 import { CreditCardItem } from "@/features/credit-cards/components/credit-card-item"
 import { formatCurrency, type Currency } from "@/lib/utils/currency"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
 
-export default async function CreditCardsPage() {
-  const supabase = await createClient()
+export default function CreditCardsPage() {
+  const [creditCards, setCreditCards] = useState<any[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [userCurrency, setUserCurrency] = useState<Currency>("USD")
+  const supabase = createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  useEffect(() => {
+    fetchCreditCards()
+  }, [])
 
-  const { data: profile } = await supabase.from("profiles").select("currency").eq("id", user?.id).single()
-  const userCurrency: Currency = profile?.currency || "USD"
+  const fetchCreditCards = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-  const { data: creditCards } = await supabase
-    .from("credit_cards")
-    .select("*")
-    .eq("user_id", user?.id)
-    .order("created_at", { ascending: false })
+      if (user) {
+        const { data: profile } = await supabase.from("profiles").select("currency").eq("id", user.id).single()
+        setUserCurrency(profile?.currency || "USD")
+
+        const { data: creditCardsData } = await supabase
+          .from("credit_cards")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+
+        setCreditCards(creditCardsData || [])
+      }
+    } catch (error) {
+      console.error("Error fetching credit cards:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleCreditCardCreated = () => {
+    setIsModalOpen(false)
+    fetchCreditCards() // Recargar las tarjetas
+  }
 
   const totalLimit = creditCards?.reduce((sum, card) => sum + Number(card.limit_amount), 0) || 0
   const totalSpent = creditCards?.reduce((sum, card) => sum + Number(card.current_spent), 0) || 0
@@ -43,7 +70,7 @@ export default async function CreditCardsPage() {
             <h2 className="text-2xl font-bold">Mis Tarjetas</h2>
             <p className="text-muted-foreground">Total: {creditCards?.length || 0} tarjetas</p>
           </div>
-          <Dialog>
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -55,7 +82,7 @@ export default async function CreditCardsPage() {
                 <DialogTitle>Crear Nueva Tarjeta</DialogTitle>
                 <DialogDescription>Agrega una nueva tarjeta de crédito para monitorear</DialogDescription>
               </DialogHeader>
-              <CreditCardForm />
+              <CreditCardForm onSuccess={handleCreditCardCreated} />
             </DialogContent>
           </Dialog>
         </div>
@@ -77,7 +104,11 @@ export default async function CreditCardsPage() {
           </div>
         )}
 
-        {creditCards && creditCards.length > 0 ? (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <p className="text-muted-foreground">Cargando tarjetas...</p>
+          </div>
+        ) : creditCards && creditCards.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {creditCards.map((card) => (
               <CreditCardItem key={card.id} card={card} currency={userCurrency} />

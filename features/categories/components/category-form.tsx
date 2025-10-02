@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { toast } from "sonner"
 
 interface CategoryFormProps {
   category?: {
@@ -62,8 +63,10 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
       }
 
       router.refresh()
+      toast.success("Categoría guardada correctamente")
       if (onSuccess) onSuccess()
     } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Error al guardar la categoría")
       setError(error instanceof Error ? error.message : "Error al guardar la categoría")
     } finally {
       setIsLoading(false)
