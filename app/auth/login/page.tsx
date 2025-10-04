@@ -116,7 +116,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               className="w-full bg-transparent"
@@ -142,7 +142,7 @@ export default function LoginPage() {
                 />
               </svg>
               Google
-            </Button>
+            </Button> */}
 
             {activeUsers < Number(process.env.NEXT_PUBLIC_MAX_USERS) && (
             <div className="mt-4 text-center text-sm">

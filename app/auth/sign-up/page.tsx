@@ -119,7 +119,7 @@ export default function SignUpPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+          redirectTo: 'https://wobtoqtgdqvazjzoqenf.supabase.co/auth/v1/callback',
         },
       })
       if (error) throw error
@@ -200,7 +200,7 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               className="w-full bg-transparent"
@@ -226,7 +226,7 @@ export default function SignUpPage() {
                 />
               </svg>
               Google
-            </Button>
+            </Button> */}
 
             <div className="mt-4 text-center text-sm">
               ¿Ya tienes una cuenta?{" "}
