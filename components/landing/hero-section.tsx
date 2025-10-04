@@ -2,10 +2,12 @@
 
 import { Button } from '@/components/ui/button'
 import { useActiveUser } from '@/hooks/use-active-user'
+import { UserIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 export function HeroSection() {
-  const MAX_USERS = 50
+  const MAX_USERS = Number(process.env.NEXT_PUBLIC_MAX_USERS)
+  console.log(MAX_USERS)
   const { activeUsers, loading } = useActiveUser()
   const router = useRouter()
 
@@ -17,7 +19,7 @@ export function HeroSection() {
       {/* Content */}
       <div className='relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-6 text-center text-white'>
         {/* Beta Banner */}
-        <div className='rounded-full bg-primary/20 px-4 py-1.5 text-sm font-semibold text-primary'>
+        <div className='rounded-full bg-primary/20 px-4 py-1.5 text-sm font-semibold animate-bounce text-primary'>
           Versión Beta Gratuita
         </div>
 
@@ -33,20 +35,39 @@ export function HeroSection() {
         </p>
 
         {/* CTA Button */}
-        <Button
-          size='lg'
-          className='mt-4 h-12 px-6 text-base font-bold shadow-lg transition-transform hover:scale-105'
-          disabled={loading}
-          onClick={() => {
-            router.push('/auth/sign-up')
-          }}
-        >
-          {loading
-            ? 'Cargando...'
-            : `Solicitar acceso a la beta (${
-                MAX_USERS - activeUsers
-              } slots restantes)`}
-        </Button>
+        {activeUsers < MAX_USERS ? (
+          <>
+            <Button
+              size='lg'
+              className='mt-4 h-12 px-6 text-base font-bold shadow-lg transition-transform hover:scale-105'
+              disabled={loading}
+              onClick={() => {
+                router.push('/auth/sign-up')
+              }}
+            >
+              {loading
+                ? 'Cargando...'
+                : `Solicitar acceso a la beta (${
+                    MAX_USERS - activeUsers
+                  } cupos restantes)`}
+            </Button>
+            <div className='text-sm text-muted-foreground flex items-center gap-2'>
+              <UserIcon className='h-4 w-4 text-primary' />
+              <p>{`${activeUsers} usuarios activos`}</p>
+            </div>
+          </>
+        ) : (
+          <Button
+            size='lg'
+            className='mt-4 h-12 px-6 text-base font-bold shadow-lg transition-transform hover:scale-105'
+            disabled={loading}
+            onClick={() => {
+              router.push('/auth/login')
+            }}
+          >
+            Acceder
+          </Button>
+        )}
       </div>
     </section>
   )

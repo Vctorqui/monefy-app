@@ -1,7 +1,7 @@
 "use client"
 
-import type React from "react"
-
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,53 +9,90 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect } from "react"
 import { toast } from "sonner"
 import { useActiveUser } from "@/hooks/use-active-user"
+import { useBetaLimit } from "@/hooks/use-beta-limit"
+import { useAuthErrors } from "@/hooks/use-auth-errors"
+import { loginSchema, type LoginFormData } from "@/lib/validations/auth"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const { activeUsers, loading } = useActiveUser()
+  const { activeUsers } = useActiveUser()
+  const { isLimitReached } = useBetaLimit()
+  const { error, handleSupabaseError, clearError } = useAuthErrors()
   const router = useRouter()
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: "onBlur",
+    defaultValues: {
+      email: "",
+      password: ""
+    }
+  })
+
+  // Verificar errores de URL (callback de verificación)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const urlError = urlParams.get('error')
+    
+    if (urlError) {
+      switch (urlError) {
+        case 'verification_failed':
+          handleSupabaseError({ message: 'Error al verificar el correo. Intenta registrarte nuevamente.' })
+          break
+        case 'no_code':
+          handleSupabaseError({ message: 'Enlace de verificación inválido.' })
+          break
+        case 'unexpected_error':
+          handleSupabaseError({ message: 'Error inesperado. Intenta nuevamente.' })
+          break
+        default:
+          handleSupabaseError({ message: 'Error en la verificación del correo.' })
+      }
+    }
+  }, [handleSupabaseError])
+
+  const onSubmit = async (data: LoginFormData) => {
+    clearError()
     const supabase = createClient()
-    setIsLoading(true)
-    setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-      if (error) throw error
-      
-      // Mostrar mensaje de bienvenida
-      toast.success("¡Bienvenido! Has iniciado sesión correctamente", {
-        description: "Redirigiendo al dashboard...",
-        duration: 3000,
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
       })
       
-      // Pequeño delay para que se vea el toast antes de redirigir
-      setTimeout(() => {
-        router.push("/dashboard")
-        router.refresh()
-      }, 1000)
+      if (error) {
+        handleSupabaseError(error)
+        return
+      }
+
+      if (authData.user) {
+        toast.success("¡Bienvenido! Has iniciado sesión correctamente", {
+          description: "Redirigiendo al dashboard...",
+          duration: 3000,
+        })
+        
+        setTimeout(() => {
+          router.push("/dashboard")
+          router.refresh()
+        }, 1000)
+      }
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Error al iniciar sesión")
-    } finally {
-      setIsLoading(false)
+      console.error('Login error:', error)
+      handleSupabaseError({ message: 'Error inesperado. Intenta nuevamente.' })
     }
   }
 
   const handleGoogleLogin = async () => {
     const supabase = createClient()
-    setIsLoading(true)
-    setError(null)
+    clearError()
 
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -66,8 +103,8 @@ export default function LoginPage() {
       })
       if (error) throw error
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Error al iniciar sesión con Google")
-      setIsLoading(false)
+      console.error('Google login error:', error)
+      handleSupabaseError(error)
     }
   }
 
@@ -80,33 +117,45 @@ export default function LoginPage() {
             <CardDescription>Ingresa tu correo y contraseña para acceder</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Correo electrónico</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="tu@correo.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
+                  {...register("email")}
+                  disabled={isSubmitting}
+                  className={errors.email ? "border-destructive" : ""}
                 />
+                {errors.email && (
+                  <p className="text-sm text-destructive">{errors.email.message}</p>
+                )}
               </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="password">Contraseña</Label>
                 <Input
                   id="password"
                   type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
+                  {...register("password")}
+                  disabled={isSubmitting}
+                  className={errors.password ? "border-destructive" : ""}
                 />
+                {errors.password && (
+                  <p className="text-sm text-destructive">{errors.password.message}</p>
+                )}
               </div>
-              {error && <p className="text-sm text-destructive">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
+
+
+              {error && (
+                <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                  {error}
+                </div>
+              )}
+
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
               </Button>
             </form>
 
@@ -119,12 +168,12 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               className="w-full bg-transparent"
               onClick={handleGoogleLogin}
-              disabled={isLoading}
+              disabled={isSubmitting}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -145,15 +194,15 @@ export default function LoginPage() {
                 />
               </svg>
               Google
-            </Button>
+            </Button> */}
 
-            {activeUsers < 50 && (
-            <div className="mt-4 text-center text-sm">
-              ¿No tienes una cuenta?{" "}
-              <Link href="/auth/sign-up" className="underline underline-offset-4 hover:text-primary">
-                Regístrate
-              </Link>
-            </div>
+            {!isLimitReached && (
+              <div className="mt-4 text-center text-sm">
+                ¿No tienes una cuenta?{" "}
+                <Link href="/auth/sign-up" className="underline underline-offset-4 hover:text-primary">
+                  Regístrate
+                </Link>
+              </div>
             )}
           </CardContent>
         </Card>

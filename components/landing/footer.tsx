@@ -3,6 +3,11 @@
 import Link from 'next/link'
 
 export function Footer() {
+
+  const getCurrentYear = () => {
+    return new Date().getFullYear()
+  }
+
   return (
     <footer className="border-t bg-background">
       <div className="mx-auto max-w-5xl px-5 py-10">
@@ -22,7 +27,7 @@ export function Footer() {
           
           {/* Copyright */}
           <p className="text-sm text-muted-foreground">
-            © 2024 FinanzasApp. Todos los derechos reservados.
+            © {getCurrentYear()} Monefy. Todos los derechos reservados.
           </p>
         </div>
       </div>

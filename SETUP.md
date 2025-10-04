@@ -1,6 +1,6 @@
 # 🚀 Guía de Configuración Rápida
 
-Esta guía te ayudará a configurar Finance App en tu máquina local paso a paso.
+Esta guía te ayudará a configurar Monefy App en tu máquina local paso a paso.
 
 ## 📋 Checklist de Configuración
 
@@ -17,7 +17,7 @@ Esta guía te ayudará a configurar Finance App en tu máquina local paso a paso
 ```bash
 # Clonar el repositorio
 git clone <tu-repositorio>
-cd finance-app
+cd monefy-app
 
 # Instalar dependencias
 npm install

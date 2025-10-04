@@ -1,5 +1,5 @@
 {
-  "name": "finance-app",
+  "name": "monefy-app",
   "version": "0.1.0",
   "private": true,
   "author": "Víctor Quiñones",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@formkit/drag-and-drop": "^0.5.3",
-    "@hookform/resolvers": "^3.10.0",
+    "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -58,14 +58,14 @@
     "react": "^18",
     "react-day-picker": "9.8.0",
     "react-dom": "^18",
-    "react-hook-form": "^7.60.0",
+    "react-hook-form": "^7.64.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.4",
     "sonner": "^2.0.7",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
-    "zod": "3.25.67"
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
