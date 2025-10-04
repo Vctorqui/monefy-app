@@ -29,6 +29,20 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Check beta user limit for sign-up page
+  if (request.nextUrl.pathname.startsWith("/auth/sign-up")) {
+    const MAX_USERS = Number(process.env.NEXT_PUBLIC_MAX_USERS) // O process.env.NEXT_PUBLIC_MAX_USERS
+    const { count } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+    
+    if (count && count >= MAX_USERS) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/beta-full"
+      return NextResponse.redirect(url)
+    }
+  }
+
   // Redirect unauthenticated users to login
   if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
     const url = request.nextUrl.clone()

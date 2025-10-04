@@ -4,11 +4,17 @@ interface FeatureCardProps {
   icon: React.ReactNode
   title: string
   description: string
+  label?: string
 }
 
-function FeatureCard({ icon, title, description }: FeatureCardProps) {
+function FeatureCard({ icon, title, description, label }: FeatureCardProps) {
   return (
-    <div className="flex flex-col gap-4 rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-lg hover:border-primary/40">
+    <div className="flex flex-col gap-4 rounded-xl relative border bg-card p-6 shadow-sm transition-all hover:shadow-lg hover:border-primary/40">
+      {label && (
+        <div className="absolute top-0 right-0 text-primary px-2 py-1 rounded-lg border border-primary/40 rounded-br-none rounded-tl-none text-sm">
+          {label}
+        </div>
+      )}
       <div className="flex size-12 items-center justify-center rounded-lg bg-primary/20 text-primary">
         {icon}
       </div>
@@ -51,6 +57,7 @@ export function FeaturesSection() {
         </svg>
       ),
       title: "Análisis financiero",
+      label: 'Proximamente',
       description: "Visualiza gráficos y reportes detallados para entender tus hábitos financieros."
     }
   ]
@@ -76,6 +83,7 @@ export function FeaturesSection() {
               icon={feature.icon}
               title={feature.title}
               description={feature.description}
+              label={feature.label}
             />
           ))}
         </div>

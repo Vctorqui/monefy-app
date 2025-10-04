@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useBetaLimit } from "@/hooks/use-beta-limit"
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("")
@@ -19,6 +20,26 @@ export default function SignUpPage() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { isLimitReached, loading: limitLoading } = useBetaLimit()
+
+  // Redirect if beta limit is reached
+  useEffect(() => {
+    if (isLimitReached) {
+      router.push("/beta-full")
+    }
+  }, [isLimitReached, router])
+
+  // Show loading state while checking limit
+  if (limitLoading) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center p-6 bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-sm text-muted-foreground">Verificando disponibilidad...</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()

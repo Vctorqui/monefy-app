@@ -8,9 +8,23 @@ import { Suspense } from "react"
 import { Toaster } from "sonner"
 
 export const metadata: Metadata = {
-  title: "FinanzasApp - Gestión de Finanzas Personales",
+  title: "Monefy - Gestión de Finanzas Personales",
   description: "Controla tus gastos, ingresos y tarjetas de crédito en un solo lugar",
-  generator: "v0.app",
+  icons: {
+    icon: [
+      {
+        url: "/monefy.ico",
+        sizes: "any",
+      },
+      {
+        url: "/monefy-logo.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+    ],
+    shortcut: "/monefy.ico",
+    apple: "/monefy-logo.png",
+  },
 }
 
 export default function RootLayout({

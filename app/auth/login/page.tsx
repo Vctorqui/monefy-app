@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -60,9 +59,6 @@ export default function LoginPage() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-        },
       })
       if (error) throw error
     } catch (error: unknown) {
@@ -70,6 +66,7 @@ export default function LoginPage() {
       setIsLoading(false)
     }
   }
+
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center p-6 bg-background">
@@ -147,7 +144,7 @@ export default function LoginPage() {
               Google
             </Button>
 
-            {activeUsers < 50 && (
+            {activeUsers < Number(process.env.NEXT_PUBLIC_MAX_USERS) && (
             <div className="mt-4 text-center text-sm">
               ¿No tienes una cuenta?{" "}
               <Link href="/auth/sign-up" className="underline underline-offset-4 hover:text-primary">

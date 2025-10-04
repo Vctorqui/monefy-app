@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { useActiveUser } from '@/hooks/use-active-user'
+import { useBetaLimit } from '@/hooks/use-beta-limit'
 import { FinanzasAppIcon } from '../icon'
 import { useState } from 'react'
 import { MenuIcon } from 'lucide-react'
@@ -22,6 +23,7 @@ const navLinks = [
 
 export function Header() {
   const { activeUsers, loading } = useActiveUser()
+  const { isLimitReached } = useBetaLimit()
   const [open, setOpen] = useState(false)
 
   return (
@@ -31,7 +33,7 @@ export function Header() {
         <div className='size-8 text-primary'>
           <FinanzasAppIcon />
         </div>
-        <h2 className='text-lg md:text-xl font-bold text-foreground'>FinanzasApp</h2>
+        <h2 className='text-lg md:text-xl font-bold text-foreground'>Monefy</h2>
       </div>
 
       {/* Desktop Navigation & Buttons */}
@@ -57,7 +59,7 @@ export function Header() {
               <span className='truncate'>Acceder</span>
             </Button>
           </Link>
-          {activeUsers < 50 && (
+          {!isLimitReached && (
             <Link href='/auth/sign-up'>
               <Button className='flex h-10 min-w-[84px] max-w-[480px] items-center justify-center overflow-hidden rounded-lg px-4 text-sm font-bold'>
                 <span className='truncate'>Registrarse</span>
@@ -96,7 +98,7 @@ export function Header() {
               </Link>
             </DropdownMenuItem>
             
-            {activeUsers < 50 && (
+            {!isLimitReached && (
               <DropdownMenuItem asChild>
                 <Link href='/auth/sign-up' onClick={() => setOpen(false)}>
                   <div className="flex items-center w-full px-2 py-1.5 text-sm hover:bg-accent rounded-sm">
