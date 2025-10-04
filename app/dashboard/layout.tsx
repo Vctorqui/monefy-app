@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
+import { FloatingCalculator } from "@/components/floating-calculator"	
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -54,6 +55,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
         />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+      
+      {/* Floating Calculator - Available in all dashboard pages */}
+      <FloatingCalculator />
     </div>
   )
 }

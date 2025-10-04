@@ -1,124 +1,62 @@
-"use client"
+import { createClient } from "@/lib/supabase/server"
+import { TransactionsClientPage } from "./transactions-client"
 
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Plus } from "lucide-react"
-import { TransactionForm } from "@/features/transactions/components/transaction-form"
-import { TransactionList } from "@/features/transactions/components/transaction-list"
-import type { Currency } from "@/lib/utils/currency"
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase/client"
+// Cache revalidation configuration
+export const revalidate = 60 // Revalidate every 60 seconds
 
-export default function TransactionsPage() {
-  const [transactions, setTransactions] = useState<any[]>([])
-  const [accounts, setAccounts] = useState<any[]>([])
-  const [creditCards, setCreditCards] = useState<any[]>([])
-  const [categories, setCategories] = useState<any[]>([])
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [userCurrency, setUserCurrency] = useState<Currency>("USD")
-  const supabase = createClient()
+export default async function TransactionsPage() {
+  const supabase = await createClient()
 
-  useEffect(() => {
-    fetchData()
-  }, [])
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  const fetchData = async () => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (user) {
-        const { data: profile } = await supabase.from("profiles").select("currency").eq("id", user.id).single()
-        setUserCurrency(profile?.currency || "USD")
-
-        // Fetch all data in parallel
-        const [
-          { data: transactionsData },
-          { data: accountsData },
-          { data: creditCardsData },
-          { data: categoriesData }
-        ] = await Promise.all([
-          supabase.from("transactions").select("*").eq("user_id", user.id).order("date", { ascending: false }),
-          supabase.from("accounts").select("id, name").eq("user_id", user.id),
-          supabase.from("credit_cards").select("id, name, limit_amount, current_spent").eq("user_id", user.id),
-          supabase.from("categories").select("id, name, type").eq("user_id", user.id)
-        ])
-
-        setTransactions(transactionsData || [])
-        setAccounts(accountsData || [])
-        setCreditCards(creditCardsData || [])
-        setCategories(categoriesData || [])
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error)
-    } finally {
-      setIsLoading(false)
-    }
+  if (!user) {
+    return <div>Usuario no encontrado</div>
   }
 
-  const handleTransactionCreated = () => {
-    setIsModalOpen(false)
-    fetchData() // Recargar todos los datos
-  }
+  // Fetch user's currency from profile with cache tag
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("currency")
+    .eq("id", user.id)
+    .single()
+
+  const userCurrency = profile?.currency || "USD"
+
+  // Fetch all data in parallel with cache optimization
+  const [
+    { data: transactions },
+    { data: accounts },
+    { data: creditCards },
+    { data: categories }
+  ] = await Promise.all([
+    supabase
+      .from("transactions")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("date", { ascending: false }),
+    supabase
+      .from("accounts")
+      .select("id, name")
+      .eq("user_id", user.id),
+    supabase
+      .from("credit_cards")
+      .select("id, name, limit_amount, current_spent")
+      .eq("user_id", user.id),
+    supabase
+      .from("categories")
+      .select("id, name, type")
+      .eq("user_id", user.id)
+  ])
 
   return (
-    <div className="flex flex-col">
-
-      <div className="flex-1 space-y-6 p-4 md:p-6">
-        <div className="flex justify-center md:justify-between items-center md:flex-row flex-col gap-4">
-          <div className="text-center md:text-left">
-            <h2 className="text-2xl font-bold">Mis Transacciones</h2>
-            <p className="text-muted-foreground">Total: {transactions?.length || 0} transacciones</p>
-          </div>
-          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Nueva Transacción
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Crear Nueva Transacción</DialogTitle>
-                <DialogDescription>Registra un nuevo ingreso o gasto</DialogDescription>
-              </DialogHeader>
-              <TransactionForm 
-                accounts={accounts || []} 
-                creditCards={creditCards || []}
-                categories={categories || []}
-                onSuccess={handleTransactionCreated}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-muted-foreground">Cargando transacciones...</p>
-          </div>
-        ) : transactions && transactions.length > 0 ? (
-          <TransactionList
-            transactions={transactions}
-            accounts={accounts || []}
-            creditCards={creditCards || []}
-            categories={categories || []}
-            currency={userCurrency}
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-muted-foreground mb-4">No tienes transacciones aún</p>
-          </div>
-        )}
-      </div>
-    </div>
+    <TransactionsClientPage
+      initialTransactions={transactions || []}
+      initialAccounts={accounts || []}
+      initialCreditCards={creditCards || []}
+      initialCategories={categories || []}
+      userCurrency={userCurrency}
+    />
   )
 }
