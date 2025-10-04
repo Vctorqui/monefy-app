@@ -3,6 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Wallet, TrendingUp, TrendingDown, CreditCard } from "lucide-react"
 import { formatCurrency, type Currency } from "@/lib/utils/currency"
 
+// Cache revalidation configuration
+export const revalidate = 60 // Revalidate every 60 seconds
+
 export default async function DashboardPage() {
   const supabase = await createClient()
 

@@ -2,6 +2,9 @@ import { redirect } from "next/navigation"
 import { createServerClient } from "@/lib/supabase/server"
 import { ProfileForm } from "@/features/settings/components/profile-form"
 
+// Cache revalidation configuration
+export const revalidate = 600 // Revalidate every 10 minutes (settings change rarely)
+
 export default async function SettingsPage() {
   const supabase = await createServerClient()
 

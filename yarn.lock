@@ -66,6 +66,11 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.10.tgz#a2a1e3812d14525f725d011a73eceb41fef5bc1c"
   integrity sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==
 
+"@formkit/drag-and-drop@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@formkit/drag-and-drop/-/drag-and-drop-0.5.3.tgz#24408c0cf8749b26d3fba3b043503efba44b4c90"
+  integrity sha512-VGQsKYc350OOMbz7wYt69YqDbn49x7RJ32eqiJieNke54nGZYmx18XEqTw0lBiJmH3RaiH6V45gB1u+tvI/TNw==
+
 "@hookform/resolvers@^3.10.0":
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-3.10.0.tgz#7bfd18113daca4e57e27e1205b7d5a2d371aa59a"
