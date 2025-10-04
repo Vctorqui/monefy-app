@@ -7,6 +7,7 @@ import { Home, Wallet, CreditCard, Tag, LogOut, TrendingUp, Settings } from "luc
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import { FinanzasAppIcon } from "../icon"
 
 const navigation = [
   { name: "Inicio", href: "/dashboard", icon: Home },
@@ -31,7 +32,7 @@ export function Sidebar() {
   return (
     <div className="flex h-full flex-col gap-y-5 bg-card border-r px-6 py-4">
       <div className="flex h-16 items-center gap-2">
-        <TrendingUp className="h-6 w-6 text-primary" />
+        <FinanzasAppIcon className="h-6 w-6 text-primary" />
         <span className="text-xl font-bold">FinanzasApp</span>
       </div>
       <nav className="flex flex-1 flex-col">

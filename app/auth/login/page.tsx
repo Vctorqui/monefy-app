@@ -11,12 +11,14 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import { useActiveUser } from "@/hooks/use-active-user"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const { activeUsers, loading } = useActiveUser()
   const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -59,7 +61,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         },
       })
       if (error) throw error
@@ -145,12 +147,14 @@ export default function LoginPage() {
               Google
             </Button>
 
+            {activeUsers < 50 && (
             <div className="mt-4 text-center text-sm">
               ¿No tienes una cuenta?{" "}
               <Link href="/auth/sign-up" className="underline underline-offset-4 hover:text-primary">
                 Regístrate
               </Link>
             </div>
+            )}
           </CardContent>
         </Card>
       </div>
