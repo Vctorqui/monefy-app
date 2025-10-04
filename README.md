@@ -1,4 +1,4 @@
-# 💰 Finance App
+# 💰 Monefy App
 
 Una aplicación web moderna para gestión de finanzas personales construida con Next.js 14, Supabase y TypeScript.
 
@@ -25,7 +25,7 @@ Una aplicación web moderna para gestión de finanzas personales construida con 
 ## 📁 Estructura del Proyecto
 
 ```
-finance-app/
+monefy-app/
 ├── app/                          # App Router de Next.js 14
 │   ├── auth/                     # Páginas de autenticación
 │   │   ├── login/               # Página de inicio de sesión
@@ -124,7 +124,7 @@ finance-app/
 
 ```bash
 git clone <tu-repositorio>
-cd finance-app
+cd monefy-app
 ```
 
 ### 2. Instalar dependencias
@@ -272,4 +272,4 @@ Si tienes problemas o preguntas:
 
 ---
 
-¡Gracias por usar Finance App! 💰✨
+¡Gracias por usar Monefy App! 💰✨
