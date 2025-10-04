@@ -1,7 +1,7 @@
 "use client"
 
-import type React from "react"
-
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,18 +9,34 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { useBetaLimit } from "@/hooks/use-beta-limit"
+import { useAuthErrors } from "@/hooks/use-auth-errors"
+import { signUpSchema, type SignUpFormData } from "@/lib/validations/auth"
+import { toast } from "sonner"
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [username, setUsername] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
   const { isLimitReached, loading: limitLoading } = useBetaLimit()
+  const { error, handleSupabaseError, clearError } = useAuthErrors()
+  const router = useRouter()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    watch
+  } = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+    mode: "onBlur",
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: ""
+    }
+  })
+
+  const password = watch("password")
 
   // Redirect if beta limit is reached
   useEffect(() => {
@@ -41,40 +57,29 @@ export default function SignUpPage() {
     )
   }
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: SignUpFormData) => {
+    clearError()
     const supabase = createClient()
-    setIsLoading(true)
-    setError(null)
-
-    if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden")
-      setIsLoading(false)
-      return
-    }
-
-    if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres")
-      setIsLoading(false)
-      return
-    }
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
           data: {
-            username: username,
+            username: data.username,
           },
         },
       })
       
-      if (error) throw error
+      if (error) {
+        handleSupabaseError(error)
+        return
+      }
       
       // If user was created successfully, ensure profile exists
-      if (data.user) {
+      if (authData.user) {
         // Wait a moment for the trigger to execute
         await new Promise(resolve => setTimeout(resolve, 1000))
         
@@ -82,7 +87,7 @@ export default function SignUpPage() {
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", data.user.id)
+          .eq("id", authData.user.id)
           .single()
         
         // If profile doesn't exist, create it manually
@@ -90,8 +95,8 @@ export default function SignUpPage() {
           const { error: createError } = await supabase
             .from("profiles")
             .insert({
-              id: data.user.id,
-              username: username,
+              id: authData.user.id,
+              username: data.username,
               currency: "USD",
             })
           
@@ -100,32 +105,35 @@ export default function SignUpPage() {
             // Don't throw error here, let the user continue
           }
         }
+
+        toast.success("¡Cuenta creada exitosamente!", {
+          description: "Revisa tu correo para verificar tu cuenta",
+          duration: 5000,
+        })
       }
       
       router.push("/auth/verify-email")
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Error al crear la cuenta")
-    } finally {
-      setIsLoading(false)
+      console.error('Signup error:', error)
+      handleSupabaseError({ message: 'Error inesperado. Intenta nuevamente.' })
     }
   }
 
   const handleGoogleSignUp = async () => {
     const supabase = createClient()
-    setIsLoading(true)
-    setError(null)
+    clearError()
 
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: 'https://wobtoqtgdqvazjzoqenf.supabase.co/auth/v1/callback',
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         },
       })
       if (error) throw error
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Error al registrarse con Google")
-      setIsLoading(false)
+      console.error('Google signup error:', error)
+      handleSupabaseError(error)
     }
   }
 
@@ -138,56 +146,73 @@ export default function SignUpPage() {
             <CardDescription>Ingresa tus datos para crear una cuenta nueva</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSignUp} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username">Nombre de usuario</Label>
                 <Input
                   id="username"
                   type="text"
                   placeholder="usuario123"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={isLoading}
+                  {...register("username")}
+                  disabled={isSubmitting}
+                  className={errors.username ? "border-destructive" : ""}
                 />
+                {errors.username && (
+                  <p className="text-sm text-destructive">{errors.username.message}</p>
+                )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email">Correo electrónico</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="tu@correo.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
+                  {...register("email")}
+                  disabled={isSubmitting}
+                  className={errors.email ? "border-destructive" : ""}
                 />
+                {errors.email && (
+                  <p className="text-sm text-destructive">{errors.email.message}</p>
+                )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="password">Contraseña</Label>
                 <Input
                   id="password"
                   type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
+                  {...register("password")}
+                  disabled={isSubmitting}
+                  className={errors.password ? "border-destructive" : ""}
                 />
+                {errors.password && (
+                  <p className="text-sm text-destructive">{errors.password.message}</p>
+                )}
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirmar Contraseña</Label>
+                <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
                 <Input
-                  id="confirm-password"
+                  id="confirmPassword"
                   type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={isLoading}
+                  {...register("confirmPassword")}
+                  disabled={isSubmitting}
+                  className={errors.confirmPassword ? "border-destructive" : ""}
                 />
+                {errors.confirmPassword && (
+                  <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+                )}
               </div>
-              {error && <p className="text-sm text-destructive">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creando cuenta..." : "Crear Cuenta"}
+
+              {error && (
+                <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                  {error}
+                </div>
+              )}
+
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Creando cuenta..." : "Crear Cuenta"}
               </Button>
             </form>
 
@@ -205,7 +230,7 @@ export default function SignUpPage() {
               variant="outline"
               className="w-full bg-transparent"
               onClick={handleGoogleSignUp}
-              disabled={isLoading}
+              disabled={isSubmitting}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
