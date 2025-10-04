@@ -6,7 +6,7 @@ import { useActiveUser } from '@/hooks/use-active-user'
 import { useBetaLimit } from '@/hooks/use-beta-limit'
 import { FinanzasAppIcon } from '../icon'
 import { useState } from 'react'
-import { MenuIcon } from 'lucide-react'
+import { LogIn, MenuIcon, UserPlus } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -93,6 +93,7 @@ export function Header() {
             <DropdownMenuItem asChild>
               <Link href='/auth/login' onClick={() => setOpen(false)}>
                 <div className="flex items-center w-full px-2 py-1.5 text-sm hover:bg-accent rounded-sm">
+                  <LogIn className="h-5 w-5 shrink-0" />
                   Acceder
                 </div>
               </Link>
@@ -102,6 +103,7 @@ export function Header() {
               <DropdownMenuItem asChild>
                 <Link href='/auth/sign-up' onClick={() => setOpen(false)}>
                   <div className="flex items-center w-full px-2 py-1.5 text-sm hover:bg-accent rounded-sm">
+                    <UserPlus className="h-5 w-5 shrink-0" />
                     Registrarse
                   </div>
                 </Link>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,9 @@ import { useBetaLimit } from "@/hooks/use-beta-limit"
 import { useAuthErrors } from "@/hooks/use-auth-errors"
 import { signUpSchema, type SignUpFormData } from "@/lib/validations/auth"
 import { toast } from "sonner"
+import { Footer } from "@/components/landing/footer"
+import { Header } from "@/components/landing/header"
+
 
 export default function SignUpPage() {
   const { isLimitReached, loading: limitLoading } = useBetaLimit()
@@ -21,13 +24,13 @@ export default function SignUpPage() {
   const router = useRouter()
 
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
     watch
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       username: "",
       email: "",
@@ -138,6 +141,8 @@ export default function SignUpPage() {
   }
 
   return (
+    <>
+      <Header />
     <div className="flex min-h-screen w-full items-center justify-center p-6 bg-background">
       <div className="w-full max-w-sm">
         <Card>
@@ -149,13 +154,19 @@ export default function SignUpPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username">Nombre de usuario</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="usuario123"
-                  {...register("username")}
-                  disabled={isSubmitting}
-                  className={errors.username ? "border-destructive" : ""}
+                <Controller
+                  name="username"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="username"
+                      type="text"
+                      placeholder="usuario123"
+                      {...field}
+                      disabled={isSubmitting}
+                      className={errors.username ? "border-destructive" : ""}
+                    />
+                  )}
                 />
                 {errors.username && (
                   <p className="text-sm text-destructive">{errors.username.message}</p>
@@ -164,13 +175,19 @@ export default function SignUpPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="email">Correo electrónico</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="tu@correo.com"
-                  {...register("email")}
-                  disabled={isSubmitting}
-                  className={errors.email ? "border-destructive" : ""}
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="tu@correo.com"
+                      {...field}
+                      disabled={isSubmitting}
+                      className={errors.email ? "border-destructive" : ""}
+                    />
+                  )}
                 />
                 {errors.email && (
                   <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -179,12 +196,18 @@ export default function SignUpPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="password">Contraseña</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  {...register("password")}
-                  disabled={isSubmitting}
-                  className={errors.password ? "border-destructive" : ""}
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="password"
+                      type="password"
+                      {...field}
+                      disabled={isSubmitting}
+                      className={errors.password ? "border-destructive" : ""}
+                    />
+                  )}
                 />
                 {errors.password && (
                   <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -193,12 +216,18 @@ export default function SignUpPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  {...register("confirmPassword")}
-                  disabled={isSubmitting}
-                  className={errors.confirmPassword ? "border-destructive" : ""}
+                <Controller
+                  name="confirmPassword"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      {...field}
+                      disabled={isSubmitting}
+                      className={errors.confirmPassword ? "border-destructive" : ""}
+                    />
+                  )}
                 />
                 {errors.confirmPassword && (
                   <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
@@ -260,8 +289,10 @@ export default function SignUpPage() {
               </Link>
             </div>
           </CardContent>
-        </Card>
+          </Card>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   )
 }

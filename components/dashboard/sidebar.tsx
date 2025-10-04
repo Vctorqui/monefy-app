@@ -33,7 +33,7 @@ export function Sidebar() {
     <div className="flex h-full flex-col gap-y-5 bg-card border-r px-6 py-4">
       <div className="flex h-16 items-center gap-2">
         <FinanzasAppIcon className="h-6 w-6 text-primary" />
-        <span className="text-xl font-bold">FinanzasApp</span>
+        <span className="text-xl font-bold">Monefy</span>
       </div>
       <nav className="flex flex-1 flex-col">
         <ul role="list" className="flex flex-1 flex-col gap-y-1">
