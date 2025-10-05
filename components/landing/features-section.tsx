@@ -63,7 +63,7 @@ export function FeaturesSection() {
   ]
 
   return (
-    <section className="py-16 px-4 md:px-10 lg:py-24">
+    <section id="features" className="py-16 px-4 md:px-10 lg:py-24">
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="mb-12 text-center">

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Plus } from "lucide-react"
 import { TransactionForm } from "@/features/transactions/components/transaction-form"
-import { TransactionList } from "@/features/transactions/components/transaction-list"
+import { TransactionView } from "@/features/transactions/components/transaction-view"
 import type { Currency } from "@/lib/utils/currency"
 
 interface TransactionsClientPageProps {
@@ -73,7 +73,7 @@ export function TransactionsClientPage({
         </div>
 
         {transactions && transactions.length > 0 ? (
-          <TransactionList
+          <TransactionView
             transactions={transactions}
             accounts={accounts || []}
             creditCards={creditCards || []}

@@ -12,7 +12,7 @@ export function HeroSection() {
   const router = useRouter()
 
   return (
-    <section className='relative flex min-h-[60vh] items-center justify-center p-4 md:p-10'>
+    <section id="hero" className='relative flex min-h-[60vh] items-center justify-center p-4 md:p-10'>
       {/* Background Image */}
       <div className='absolute inset-0 bg-cover bg-center' />
 
