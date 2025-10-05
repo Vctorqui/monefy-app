@@ -133,14 +133,14 @@ export function TransactionList({ transactions, accounts, creditCards, categorie
                 <span>• {new Date(transaction.date).toLocaleDateString()}</span>
               </div>
             </div>
-            <div className="flex items-center gap-4 mt-8">
+            <div className="flex items-center justify-between mt-4">
               <div
                 className={`text-lg font-semibold ${transaction.type === "income" ? "text-green-500" : "text-red-500"}`}
               >
                 {transaction.type === "income" ? "+" : "-"}
                 {formatCurrency(Number(transaction.amount), currency)}
               </div>
-              <div className="flex gap-2 absolute right-4 top-2">
+              <div className="flex gap-2">
                 <Button variant="ghost" size="icon" onClick={() => handleEdit(transaction)}>
                   <Pencil className="h-4 w-4" />
                   <span className="sr-only">Editar</span>

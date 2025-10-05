@@ -14,22 +14,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useRouter } from 'next/navigation'
 
 const navLinks = [
   { href: '/', label: 'Inicio' },
-  { href: '/features', label: 'Funcionalidades' },
-  { href: '/contact', label: 'Contacto' },
+  { href: '#features', label: 'Funcionalidades' },
+  // { href: '/contact', label: 'Contacto' },
 ]
 
 export function Header() {
   const { activeUsers, loading } = useActiveUser()
   const { isLimitReached } = useBetaLimit()
   const [open, setOpen] = useState(false)
+  const router = useRouter()
 
   return (
-    <header className='flex items-center justify-between whitespace-nowrap border-b px-4 md:px-10 py-4 bg-background'>
+    
+    <header id="header" className='flex items-center justify-between whitespace-nowrap border-b px-4 md:px-10 py-4 bg-background'>
       {/* Logo */}
-      <div className='flex items-center gap-3'>
+      <div className='flex items-center gap-3' onClick={() => router.push('/')}>
         <div className='size-8 text-primary'>
           <FinanzasAppIcon />
         </div>
