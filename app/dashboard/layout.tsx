@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
-import { FloatingCalculator } from "@/components/floating-calculator"	
+import { FloatingCalculator } from "@/components/shared/floating-calculator"	
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
