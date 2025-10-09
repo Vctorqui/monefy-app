@@ -6,6 +6,7 @@ import { useActiveUser } from '@/hooks/use-active-user'
 import { Rocket, UserIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Aurora from '../aurora/aurora'
+import RotatingText from '../rotating-text/rotating-text'
 
 export function HeroSection() {
   const MAX_USERS = Number(process.env.NEXT_PUBLIC_MAX_USERS)
@@ -46,15 +47,29 @@ export function HeroSection() {
             <GlassButton
               onClick={() => router.push('/auth/sign-up')}
               disabled={loading || activeUsers >= MAX_USERS}
-              className="text-sm font-semibold"
+              className='text-sm font-semibold'
             >
               Versión Beta Gratuita
             </GlassButton>
 
             {/* Main Heading */}
             <h1 className='text-4xl font-extrabold leading-tight tracking-tighter md:text-6xl'>
-              Gestiona tus finanzas personales de forma{' '}
+              Gestiona tus finanzas personales de forma {' '}
               <span className='text-primary'>simple.</span>
+   {/*   
+                <RotatingText
+                  texts={['simple.', 'inteligente.', 'automática.']}
+                  mainClassName='px-2 sm:px-2 md:px-3 bg-cyan-300 text-black overflow-hidden py-0.5 sm:py-1 md:py-2 rounded-lg inline'   
+                  staggerFrom={'last'}
+                  initial={{ y: '100%' }}
+                  animate={{ y: 0 }}
+                  exit={{ y: '-120%' }}
+                  staggerDuration={0.025}
+                  splitLevelClassName='overflow-hidden pb-0.5 sm:pb-1 md:pb-1'
+                  transition={{ type: 'spring', damping: 30, stiffness: 400 }}
+                  rotationInterval={2000}
+                /> */}
+      
             </h1>
 
             {/* Description */}
@@ -71,7 +86,7 @@ export function HeroSection() {
                     router.push('/auth/sign-up')
                   }}
                   disabled={loading}
-                  className="h-12 px-6 text-base font-bold"
+                  className='h-12 px-6 text-base font-bold'
                 >
                   {loading
                     ? 'Cargando...'
@@ -91,7 +106,7 @@ export function HeroSection() {
                   router.push('/auth/login')
                 }}
                 disabled={loading}
-                className="h-12 px-6 text-base font-bold"
+                className='h-12 px-6 text-base font-bold'
               >
                 Acceder
               </GlassButton>

@@ -40,7 +40,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:w-64 md:flex-col">
         <Sidebar />
@@ -53,7 +53,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           user={user}
           profile={profile}
         />
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-gradient-to-br from-neutral-950/50 via-neutral-900/30 to-neutral-950/50 backdrop-blur-sm">
+          {children}
+        </main>
       </div>
       
       {/* Floating Calculator - Available in all dashboard pages */}

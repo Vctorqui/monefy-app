@@ -4,7 +4,6 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
@@ -14,8 +13,9 @@ import { useBetaLimit } from "@/hooks/use-beta-limit"
 import { useAuthErrors } from "@/hooks/use-auth-errors"
 import { signUpSchema, type SignUpFormData } from "@/lib/validations/auth"
 import { toast } from "sonner"
-import { Footer } from "@/components/landing/footer"
-import { Header } from "@/components/landing/header"
+import { AuthLayout } from "@/components/layouts/auth-layout"
+import { GlassCard, GlassCardContent, GlassCardDescription, GlassCardHeader, GlassCardTitle } from "@/components/shared/glass-card"
+import { AppInfoSection } from "@/components/auth/app-info-section"
 
 
 export default function SignUpPage() {
@@ -51,12 +51,12 @@ export default function SignUpPage() {
   // Show loading state while checking limit
   if (limitLoading) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center p-6 bg-background">
+      <AuthLayout showAppInfo={false}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-sm text-muted-foreground">Verificando disponibilidad...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sherwood-green-200 mx-auto"></div>
+          <p className="mt-4 text-sm text-neutral-400">Verificando disponibilidad...</p>
         </div>
-      </div>
+      </AuthLayout>
     )
   }
 
@@ -141,158 +141,121 @@ export default function SignUpPage() {
   }
 
   return (
-    <>
-      <Header />
-    <div className="flex min-h-screen w-full items-center justify-center p-6 bg-background">
-      <div className="w-full max-w-sm">
-        <Card>
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold">Crear Cuenta</CardTitle>
-            <CardDescription>Ingresa tus datos para crear una cuenta nueva</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="username">Nombre de usuario</Label>
-                <Controller
-                  name="username"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="username"
-                      type="text"
-                      placeholder="usuario123"
-                      {...field}
-                      disabled={isSubmitting}
-                      className={errors.username ? "border-destructive" : ""}
-                    />
-                  )}
-                />
-                {errors.username && (
-                  <p className="text-sm text-destructive">{errors.username.message}</p>
+    <AuthLayout appInfoContent={<AppInfoSection isLogin={false} />}>
+      <GlassCard>
+        <GlassCardHeader>
+          <GlassCardTitle>Crear Cuenta</GlassCardTitle>
+          <GlassCardDescription>Ingresa tus datos para crear una cuenta nueva</GlassCardDescription>
+        </GlassCardHeader>
+        <GlassCardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-neutral-400">Nombre de usuario</Label>
+              <Controller
+                name="username"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="usuario123"
+                    {...field}
+                    disabled={isSubmitting}
+                    className={`bg-neutral-900/50 border-neutral-700 text-neutral-50 placeholder:text-neutral-500 focus:border-sherwood-green-500 focus:ring-sherwood-green-500/20 ${errors.username ? "border-red-400" : ""}`}
+                  />
                 )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Correo electrónico</Label>
-                <Controller
-                  name="email"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="tu@correo.com"
-                      {...field}
-                      disabled={isSubmitting}
-                      className={errors.email ? "border-destructive" : ""}
-                    />
-                  )}
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <Controller
-                  name="password"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="password"
-                      type="password"
-                      {...field}
-                      disabled={isSubmitting}
-                      className={errors.password ? "border-destructive" : ""}
-                    />
-                  )}
-                />
-                {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
-                <Controller
-                  name="confirmPassword"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      {...field}
-                      disabled={isSubmitting}
-                      className={errors.confirmPassword ? "border-destructive" : ""}
-                    />
-                  )}
-                />
-                {errors.confirmPassword && (
-                  <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-                )}
-              </div>
-
-              {error && (
-                <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
-                  {error}
-                </div>
+              />
+              {errors.username && (
+                <p className="text-sm text-red-400">{errors.username.message}</p>
               )}
+            </div>
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Creando cuenta..." : "Crear Cuenta"}
-              </Button>
-            </form>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-neutral-400">Correo electrónico</Label>
+              <Controller
+                name="email"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="tu@correo.com"
+                    {...field}
+                    disabled={isSubmitting}
+                    className={`bg-neutral-900/50 border-neutral-700 text-neutral-50 placeholder:text-neutral-500 focus:border-sherwood-green-500 focus:ring-sherwood-green-500/20 ${errors.email ? "border-red-400" : ""}`}
+                  />
+                )}
+              />
+              {errors.email && (
+                <p className="text-sm text-red-400">{errors.email.message}</p>
+              )}
+            </div>
 
-            <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-neutral-400">Contraseña</Label>
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="password"
+                    type="password"
+                    {...field}
+                    disabled={isSubmitting}
+                    className={`bg-neutral-900/50 border-neutral-700 text-neutral-50 placeholder:text-neutral-500 focus:border-sherwood-green-500 focus:ring-sherwood-green-500/20 ${errors.password ? "border-red-400" : ""}`}
+                  />
+                )}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-400">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-neutral-400">Confirmar Contraseña</Label>
+              <Controller
+                name="confirmPassword"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    {...field}
+                    disabled={isSubmitting}
+                    className={`bg-neutral-900/50 border-neutral-700 text-neutral-50 placeholder:text-neutral-500 focus:border-sherwood-green-500 focus:ring-sherwood-green-500/20 ${errors.confirmPassword ? "border-red-400" : ""}`}
+                  />
+                )}
+              />
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-400">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
+            {error && (
+              <div className="p-3 text-sm text-red-400 bg-red-500/20 border border-red-500/30 rounded-md">
+                {error}
               </div>
-              {/* <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">O continuar con</span>
-              </div> */}
-            </div>
+            )}
 
-            {/* <Button
-              type="button"
-              variant="outline"
-              className="w-full bg-transparent"
-              onClick={handleGoogleSignUp}
-              disabled={isSubmitting}
-            >
-              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                <path
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  fill="#4285F4"
-                />
-                <path
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  fill="#34A853"
-                />
-                <path
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  fill="#FBBC05"
-                />
-                <path
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  fill="#EA4335"
-                />
-              </svg>
-              Google
-            </Button> */}
+            <Button type="submit" className="w-full bg-sherwood-green-500 hover:bg-sherwood-green-600 text-white border-sherwood-green-500" disabled={isSubmitting}>
+              {isSubmitting ? "Creando cuenta..." : "Crear Cuenta"}
+            </Button>
+          </form>
 
-            <div className="mt-4 text-center text-sm">
-              ¿Ya tienes una cuenta?{" "}
-              <Link href="/auth/login" className="underline underline-offset-4 hover:text-primary">
-                Inicia sesión
-              </Link>
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-neutral-700" />
             </div>
-          </CardContent>
-          </Card>
-        </div>
-      </div>
-      <Footer />
-    </>
+          </div>
+
+          <div className="mt-4 text-center text-sm text-neutral-400">
+            ¿Ya tienes una cuenta?{" "}
+            <Link href="/auth/login" className="underline underline-offset-4 hover:text-sherwood-green-200 text-sherwood-green-200">
+              Inicia sesión
+            </Link>
+          </div>
+        </GlassCardContent>
+      </GlassCard>
+    </AuthLayout>
   )
 }

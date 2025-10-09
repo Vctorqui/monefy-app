@@ -130,10 +130,15 @@ export function CategoryList({ categories }: CategoryListProps) {
     <>
       <div className='space-y-6'>
         <div>
-          <h3 className='text-lg font-semibold mb-4 flex items-center gap-2'>
-            <span className='h-2 w-2 rounded-full bg-green-500'></span>
-            Categorías de Ingresos ({incomeCategories.length})
-          </h3>
+          <div className='mb-4'>
+            <h3 className='text-lg font-semibold flex items-center gap-2'>
+              <span className='h-2 w-2 rounded-full bg-green-500'></span>
+              Categorías de Ingresos ({incomeCategories.length})
+            </h3>
+            <p className='text-muted-foreground text-sm'>
+              Crea categorías para organizar sus ingresos.
+            </p>
+          </div>
           {incomeCategories.length > 0 ? (
             <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
               {incomeCategories.map((category) => (
@@ -148,10 +153,15 @@ export function CategoryList({ categories }: CategoryListProps) {
         </div>
 
         <div>
-          <h3 className='text-lg font-semibold mb-4 flex items-center gap-2'>
-            <span className='h-2 w-2 rounded-full bg-red-500'></span>
-            Categorías de Gastos ({expenseCategories.length})
-          </h3>
+          <div className='mb-4'>
+            <h3 className='text-lg font-semibold flex items-center gap-2'>
+              <span className='h-2 w-2 rounded-full bg-red-500'></span>
+              Categorías de Gastos ({expenseCategories.length})
+            </h3>
+            <p className='text-muted-foreground text-sm'>
+              Crea categorías para organizar sus gastos.
+            </p>
+          </div>
           {expenseCategories.length > 0 ? (
             <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
               {expenseCategories.map((category) => (
