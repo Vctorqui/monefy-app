@@ -1,7 +1,7 @@
 'use client'
 
 import { FinanzasAppIcon } from '@/components/icon'
-import { CheckCircle, Shield, TrendingUp } from 'lucide-react'
+import { CheckCircle, CreditCard, Shield, TrendingUp } from 'lucide-react'
 
 interface AppInfoSectionProps {
   isLogin?: boolean
@@ -15,10 +15,10 @@ export function AppInfoSection({ isLogin = false }: AppInfoSectionProps) {
       description: "Gestiona tus finanzas personales con herramientas avanzadas de análisis y seguimiento."
     },
     {
-      icon: <Shield className="h-4 w-4" />,
-      title: "Seguridad Máxima",
-      description: "Tus datos están protegidos con encriptación de nivel bancario y privacidad garantizada."
-    }
+      icon: <CreditCard className="h-4 w-4" />,
+      title: "Gestión de tarjetas de crédito",
+      description: "Controla tus límites, fechas de pago y movimientos de tus tarjetas en un solo lugar."
+    },
   ]
 
   return (
@@ -57,7 +57,7 @@ export function AppInfoSection({ isLogin = false }: AppInfoSectionProps) {
       </div>
 
       {/* Testimonial o estadística */}
-      <div className="mt-8 p-6 bg-white/10 rounded-2xl border border-white/20 backdrop-blur-md">
+      {/* <div className="mt-8 p-6 bg-white/10 rounded-2xl border border-white/20 backdrop-blur-md">
         <div className="flex items-center gap-2 mb-3">
           <CheckCircle className="h-5 w-5 text-white" />
           <span className="text-white font-semibold text-lg">Más de 10,000 usuarios activos</span>
@@ -66,7 +66,7 @@ export function AppInfoSection({ isLogin = false }: AppInfoSectionProps) {
           "Monefy me ayudó a ahorrar un 30% más este año. La interfaz es intuitiva y las herramientas de análisis son increíbles."
         </p>
         <p className="text-white/70 text-xs">- María González, Usuario Premium</p>
-      </div>
+      </div> */}
     </div>
   )
 }

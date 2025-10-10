@@ -79,19 +79,19 @@ export function AccountCard({ account, currency = 'USD' }: AccountCardProps) {
 
   return (
     <div>
-      <Card>
-        <CardHeader>
+      <Card className='bg-neutral-950/80 backdrop-blur-md border border-neutral-800/50 shadow-2xl hover:bg-neutral-950/90 hover:border-sherwood-green-500/30 hover:shadow-sherwood-green-200/20 transition-all duration-300 group'>
+        <CardHeader className='border-b border-neutral-800/50'>
           <div className='flex items-start justify-between'>
             <div>
-              <CardTitle>{account.name}</CardTitle>
-              <CardDescription>
+              <CardTitle className='text-primary group-hover:text-primary/80 transition-colors duration-300'>{account.name}</CardTitle>
+              <CardDescription className='text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300'>
                 {accountTypeLabels[account.type] || account.type}
               </CardDescription>
             </div>
             <div className='flex gap-2'>
               <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogTrigger asChild>
-                  <Button variant='ghost' size='icon'>
+                  <Button variant='ghost' size='icon' className='text-primary group-hover:text-primary/80 transition-colors duration-300'>
                     <Pencil className='h-4 w-4' />
                     <span className='sr-only'>Editar</span>
                   </Button>
@@ -112,7 +112,7 @@ export function AccountCard({ account, currency = 'USD' }: AccountCardProps) {
 
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant='ghost' size='icon'>
+                  <Button variant='ghost' size='icon' className='text-destructive group-hover:text-destructive/80 duration-300'>
                     <Trash2 className='h-4 w-4' />
                     <span className='sr-only'>Eliminar</span>
                   </Button>
@@ -129,6 +129,7 @@ export function AccountCard({ account, currency = 'USD' }: AccountCardProps) {
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancelar</AlertDialogCancel>
                     <AlertDialogAction
+                    className='bg-destructive text-destructive-foreground group-hover:bg-destructive/80 hover:text-destructive-foreground/80 duration-300'
                       onClick={handleDelete}
                       disabled={isDeleting}
                     >
@@ -144,13 +145,13 @@ export function AccountCard({ account, currency = 'USD' }: AccountCardProps) {
           <div className='space-y-2'>
             <div className='flex justify-between text-sm'>
               <span className='text-muted-foreground'>Balance actual:</span>
-              <span className='font-semibold text-lg'>
+              <span className='font-semibold text-lg text-primary group-hover:text-primary/80 transition-colors duration-300'>
                 {formatCurrency(Number(account.current_balance), currency)}
               </span>
             </div>
             <div className='flex justify-between text-sm'>
               <span className='text-muted-foreground'>Balance inicial:</span>
-              <span>
+              <span className='text-primary group-hover:text-primary/80 transition-colors duration-300'>
                 {formatCurrency(Number(account.initial_balance), currency)}
               </span>
             </div>

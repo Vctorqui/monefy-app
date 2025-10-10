@@ -67,27 +67,27 @@ export function ProfileForm({ profile }: ProfileFormProps) {
   }
 
   return (
-    <Card>
+    <Card className='bg-neutral-950/80 backdrop-blur-md border border-neutral-800/50 shadow-2xl hover:bg-neutral-950/90 hover:border-sherwood-green-500/30 hover:shadow-sherwood-green-200/20 transition-all duration-300 group'>
       <CardHeader>
-        <CardTitle>Información del Perfil</CardTitle>
+        <CardTitle className='text-primary group-hover:text-primary/80 transition-colors duration-300'>Información del Perfil</CardTitle>
         <CardDescription>Actualiza tu información personal y preferencias</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Avatar Preview */}
           <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20 border border-neutral-800">
+            <Avatar className="h-20 w-20 border border-neutral-800 group-hover:border-sherwood-green-500/30 transition-all duration-300">
               {avatarUrl ? (
                 <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={profile.username} />
               ) : (
-                <AvatarFallback className="bg-sherwood-green-500 text-white text-sm">
+                <AvatarFallback className="bg-sherwood-green-500 text-white text-sm group-hover:bg-sherwood-green-500/80 transition-all duration-300">
                   {getInitials(profile.username)}
                 </AvatarFallback>
               )}
             
             </Avatar>
             <div className="flex-1">
-              <Label htmlFor="avatar_url">URL de Imagen de Perfil</Label>
+              <Label htmlFor="avatar_url" className='text-primary group-hover:text-primary/80 transition-colors duration-300'>URL de Imagen de Perfil</Label>
               <Input
                 id="avatar_url"
                 type="url"
@@ -96,13 +96,13 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                 onChange={(e) => setAvatarUrl(e.target.value)}
                 className="mt-1.5"
               />
-              <p className="mt-1 text-xs text-muted-foreground">Ingresa la URL de tu imagen de perfil</p>
+              <p className="mt-1 text-xs text-muted-foreground group-hover:text-neutral-300 transition-colors duration-300">Ingresa la URL de tu imagen de perfil</p>
             </div>
           </div>
 
           {/* Username */}
           <div className="space-y-2">
-            <Label htmlFor="username">Nombre a Previsualizar</Label>
+            <Label htmlFor="username" className='text-primary group-hover:text-primary/80 transition-colors duration-300'>Nombre a Previsualizar</Label>
             <Input
               id="username"
               type="text"
@@ -111,12 +111,12 @@ export function ProfileForm({ profile }: ProfileFormProps) {
               onChange={(e) => setUsername(e.target.value)}
               required
             />
-            <p className="text-xs text-muted-foreground">Este nombre se mostrará en tu perfil</p>
+            <p className="text-xs text-muted-foreground group-hover:text-neutral-300 transition-colors duration-300">Este nombre se mostrará en tu perfil</p>
           </div>
 
           {/* Currency */}
           <div className="space-y-2">
-            <Label htmlFor="currency">Moneda Base</Label>
+            <Label htmlFor="currency" className='text-primary group-hover:text-primary/80 transition-colors duration-300'>Moneda Base</Label>
             <Select value={currency} onValueChange={(value: "USD" | "CLP") => setCurrency(value)}>
               <SelectTrigger id="currency">
                 <SelectValue />
@@ -126,7 +126,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                 <SelectItem value="CLP">CLP - Peso Chileno</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">Todos los montos se mostrarán en esta moneda</p>
+            <p className="text-xs text-muted-foreground group-hover:text-neutral-300 transition-colors duration-300">Todos los montos se mostrarán en esta moneda</p>
           </div>
 
           <Button type="submit" disabled={isLoading} className="w-full">

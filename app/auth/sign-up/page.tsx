@@ -237,7 +237,7 @@ export default function SignUpPage() {
               </div>
             )}
 
-            <Button type="submit" className="w-full bg-sherwood-green-500 hover:bg-sherwood-green-600 text-white border-sherwood-green-500" disabled={isSubmitting}>
+            <Button type="submit" className="w-full text-primary-500 hover:text-primary-600" disabled={isSubmitting}>
               {isSubmitting ? "Creando cuenta..." : "Crear Cuenta"}
             </Button>
           </form>
@@ -248,7 +248,7 @@ export default function SignUpPage() {
             </div>
           </div>
 
-          <div className="mt-4 text-center text-sm text-neutral-400">
+          <div className="mt-4 pt-4 text-center text-sm text-neutral-400">
             ¿Ya tienes una cuenta?{" "}
             <Link href="/auth/login" className="underline underline-offset-4 hover:text-sherwood-green-200 text-sherwood-green-200">
               Inicia sesión

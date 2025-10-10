@@ -71,13 +71,13 @@ export function CategoryList({ categories }: CategoryListProps) {
   }
 
   const CategoryItem = ({ category }: { category: Category }) => (
-    <div className='flex items-center justify-between p-4 border rounded-lg bg-card'>
+    <div className='flex items-center justify-between p-4 border rounded-lg bg-neutral-950/80 backdrop-blur-md border-neutral-800/50 shadow-2xl hover:bg-neutral-950/90 hover:border-sherwood-green-500/30 hover:shadow-sherwood-green-200/20 transition-all duration-300 group'>
       <div className='flex items-center gap-3'>
         <div className='h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center'>
           <Tag className='h-5 w-5 text-primary' />
         </div>
         <div>
-          <p className='font-medium'>{category.name}</p>
+          <p className='font-medium text-primary group-hover:text-primary/80 transition-colors duration-300'>{category.name}</p>
           <Badge
             variant={category.type === 'income' ? 'default' : 'secondary'}
             className='mt-1'
@@ -98,7 +98,7 @@ export function CategoryList({ categories }: CategoryListProps) {
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant='ghost' size='icon'>
+            <Button variant='ghost' size='icon' className='text-destructive group-hover:text-destructive/80 duration-300'>
               <Trash2 className='h-4 w-4' />
               <span className='sr-only'>Eliminar</span>
             </Button>
@@ -114,6 +114,7 @@ export function CategoryList({ categories }: CategoryListProps) {
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
               <AlertDialogAction
+                className='bg-destructive text-destructive-foreground group-hover:bg-destructive/80 hover:text-destructive-foreground/80 duration-300'
                 onClick={() => handleDelete(category.id)}
                 disabled={deletingId === category.id}
               >
@@ -131,11 +132,11 @@ export function CategoryList({ categories }: CategoryListProps) {
       <div className='space-y-6'>
         <div>
           <div className='mb-4'>
-            <h3 className='text-lg font-semibold flex items-center gap-2'>
+            <h3 className='text-lg font-semibold flex items-center gap-2 text-primary group-hover:text-primary/80 transition-colors duration-300'>
               <span className='h-2 w-2 rounded-full bg-green-500'></span>
               Categorías de Ingresos ({incomeCategories.length})
             </h3>
-            <p className='text-muted-foreground text-sm'>
+            <p className='text-muted-foreground text-sm  group-hover:text-neutral-300 transition-colors duration-300'>
               Crea categorías para organizar sus ingresos.
             </p>
           </div>
@@ -146,7 +147,7 @@ export function CategoryList({ categories }: CategoryListProps) {
               ))}
             </div>
           ) : (
-            <p className='text-muted-foreground text-sm'>
+            <p className='text-muted-foreground text-sm  group-hover:text-neutral-300 transition-colors duration-300'>
               No hay categorías de ingresos
             </p>
           )}
@@ -154,11 +155,11 @@ export function CategoryList({ categories }: CategoryListProps) {
 
         <div>
           <div className='mb-4'>
-            <h3 className='text-lg font-semibold flex items-center gap-2'>
+            <h3 className='text-lg font-semibold flex items-center gap-2 text-primary group-hover:text-primary/80 transition-colors duration-300'>
               <span className='h-2 w-2 rounded-full bg-red-500'></span>
               Categorías de Gastos ({expenseCategories.length})
             </h3>
-            <p className='text-muted-foreground text-sm'>
+            <p className='text-muted-foreground text-sm  group-hover:text-neutral-300 transition-colors duration-300'>
               Crea categorías para organizar sus gastos.
             </p>
           </div>
@@ -169,7 +170,7 @@ export function CategoryList({ categories }: CategoryListProps) {
               ))}
             </div>
           ) : (
-            <p className='text-muted-foreground text-sm'>
+            <p className='text-muted-foreground text-sm group-hover:text-neutral-300 transition-colors duration-300'>
               No hay categorías de gastos
             </p>
           )}
