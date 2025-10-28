@@ -18,13 +18,12 @@ interface HeaderProps {
 export function Header({ user, profile }: HeaderProps) {
   
   return (
-    <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-neutral-800 bg-background px-4 md:px-6">
+    <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-neutral-800/50 bg-neutral-950/80 backdrop-blur-md px-4 md:px-6 shadow-lg">
       {/* Lado izquierdo: Mobile nav + Breadcrumb */}
       <div className="flex items-center gap-4">
         <MobileNav />
         <div className="flex flex-col">
           <Breadcrumb />
-
         </div>
       </div>
       

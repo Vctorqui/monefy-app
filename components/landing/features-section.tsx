@@ -9,22 +9,30 @@ interface FeatureCardProps {
 
 function FeatureCard({ icon, title, description, label }: FeatureCardProps) {
   return (
-    <div className="flex flex-col gap-4 rounded-xl relative border bg-card p-6 shadow-sm transition-all hover:shadow-lg hover:border-primary/40">
-      {label && (
-        <div className="absolute top-0 right-0 text-primary px-2 py-1 rounded-lg border border-primary/40 rounded-br-none rounded-tl-none text-sm">
-          {label}
+    <div className="glass-card group relative overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      {/* Glass effect */}
+      <div className="relative backdrop-blur-sm bg-white/5 border border-white/10 rounded-2xl p-6 h-full transition-all duration-300 hover:bg-white/10 hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/10">
+        {label && (
+          <div className="absolute top-4 right-4 glass-button text-primary px-3 py-1 rounded-full text-xs font-semibold">
+            {label}
+          </div>
+        )}
+        
+        <div className="flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/30 text-primary mb-4 group-hover:scale-110 transition-transform duration-300">
+          {icon}
         </div>
-      )}
-      <div className="flex size-12 items-center justify-center rounded-lg bg-primary/20 text-primary">
-        {icon}
-      </div>
-      <div className="flex flex-col gap-1">
-        <h3 className="text-lg font-bold text-card-foreground">
-          {title}
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          {description}
-        </p>
+        
+        <div className="flex flex-col gap-2">
+          <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors duration-300">
+            {title}
+          </h3>
+          <p className="text-gray-300 leading-relaxed">
+            {description}
+          </p>
+        </div>
       </div>
     </div>
   )
@@ -63,15 +71,16 @@ export function FeaturesSection() {
   ]
 
   return (
-    <section id="features" className="py-16 px-4 md:px-10 lg:py-24">
-      <div className="mx-auto max-w-5xl">
+    <section id="features" className="relative w-full py-16 px-4 md:px-10 lg:py-24">
+      <div className="mx-auto max-w-6xl">
         {/* Header */}
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            Funcionalidades principales
+        <div className="mb-16 text-center">
+          <h2 className="text-4xl font-bold tracking-tight text-white md:text-5xl mb-6">
+            Funcionalidades{' '}
+            <span className="text-primary">principales</span>
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            FinanzasApp te ofrece herramientas poderosas para gestionar tus finanzas de manera eficiente.
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            Monefy te ofrece herramientas poderosas para gestionar tus finanzas de manera eficiente y moderna.
           </p>
         </div>
 

@@ -131,48 +131,83 @@ export function TransactionForm({
         if (error) throw error
 
         // Update balance based on account type
+        // First, revert the balance from the original account/card
+        if (transaction.account_type === 'account') {
+          const { data: originalAccount } = await supabase
+            .from('accounts')
+            .select('current_balance')
+            .eq('id', transaction.account_id)
+            .single()
+          
+          if (originalAccount) {
+            // Revert the original transaction effect
+            const revertAmount =
+              transaction.type === 'income'
+                ? transaction.amount  // If it was income, subtract it back
+                : -transaction.amount // If it was expense, add it back
+            const originalBalance = Number(originalAccount.current_balance) + revertAmount
+            await supabase
+              .from('accounts')
+              .update({ current_balance: originalBalance })
+              .eq('id', transaction.account_id)
+          }
+        } else if (transaction.account_type === 'credit_card') {
+          const { data: originalCard } = await supabase
+            .from('credit_cards')
+            .select('current_spent')
+            .eq('id', transaction.account_id)
+            .single()
+          
+          if (originalCard) {
+            // Revert the original transaction effect
+            const revertAmount =
+              transaction.type === 'expense'
+                ? -transaction.amount // If it was expense, subtract it back from spent
+                : transaction.amount   // If it was income, add it back to spent
+            const originalSpent = Number(originalCard.current_spent) + revertAmount
+            await supabase
+              .from('credit_cards')
+              .update({ current_spent: originalSpent })
+              .eq('id', transaction.account_id)
+          }
+        }
+
+        // Then, update the new account/card balance
         if (accountType === 'account') {
-          const { data: account } = await supabase
+          const { data: newAccount } = await supabase
             .from('accounts')
             .select('current_balance')
             .eq('id', accountId)
             .single()
-          if (account) {
-            const oldAmount =
-              transaction.type === 'income'
-                ? -transaction.amount
-                : transaction.amount
+          
+          if (newAccount) {
             const newAmount =
               type === 'income' ? transactionAmount : -transactionAmount
-            const newBalance =
-              Number(account.current_balance) + oldAmount + newAmount
+            const newBalance = Number(newAccount.current_balance) + newAmount
             await supabase
               .from('accounts')
               .update({ current_balance: newBalance })
               .eq('id', accountId)
-            toast.success('Transacción actualizada correctamente')
           }
         } else {
-          const { data: card } = await supabase
+          const { data: newCard } = await supabase
             .from('credit_cards')
             .select('current_spent')
             .eq('id', accountId)
             .single()
-          if (card) {
-            const oldAmount =
-              transaction.type === 'expense'
-                ? transaction.amount
-                : -transaction.amount
+          
+          if (newCard) {
             const newAmount =
               type === 'expense' ? transactionAmount : -transactionAmount
-            const newSpent = Number(card.current_spent) - oldAmount + newAmount
+            const newSpent = Number(newCard.current_spent) + newAmount
             await supabase
               .from('credit_cards')
               .update({ current_spent: newSpent })
               .eq('id', accountId)
-            toast.success('Transacción actualizada correctamente')
           }
         }
+        
+        toast.success('Transacción actualizada correctamente')
       } else {
         // Create new transaction
         const { error } = await supabase.from('transactions').insert({
